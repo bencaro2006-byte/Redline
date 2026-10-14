@@ -1,0 +1,39 @@
+.rl-nv__intro {
+  font-size: 13.5px;
+  color: var(--rl-muted);
+  padding-bottom: 8px;
+}
+
+.rl-nv__list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rl-nv__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2px 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--rl-hairline);
+}
+
+.rl-nv__name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rl-nv__value {
+  margin: 0;
+  font-family: var(--rl-font-mono);
+  font-size: 13px;
+  color: var(--rl-accent-soft-fg);
+  text-align: right;
+}
+
+.rl-nv__why {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 13px;
+  color: var(--rl-muted);
+}

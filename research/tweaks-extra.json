@@ -1,0 +1,244 @@
+{
+  "category": "extra",
+  "tweaks": [
+    {
+      "id": "disable-inking-typing-personalization",
+      "title": "Turn Off Inking and Typing Personalization",
+      "description": "Stops Windows from collecting what you type and write to build a personal dictionary for handwriting and text suggestions.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "A desktop gaming PC with no pen gains nothing from typing and ink collection. Both values are already 1 on this PC, so applying it should report no change.",
+      "sideEffects": "Handwriting and typing suggestions stop learning new words from you.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKCU", "path": "Software\\Microsoft\\InputPersonalization", "name": "RestrictImplicitTextCollection", "valueType": "REG_DWORD", "value": 1, "default": 0 },
+        { "type": "registry", "hive": "HKCU", "path": "Software\\Microsoft\\InputPersonalization", "name": "RestrictImplicitInkCollection", "valueType": "REG_DWORD", "value": 1, "default": 0 }
+      ]
+    },
+    {
+      "id": "disable-online-speech-recognition",
+      "title": "Turn Off Online Speech Recognition",
+      "description": "Keeps dictation and voice input from sending your speech to Microsoft's cloud speech service.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "Matches Settings > Privacy > Speech > Online speech recognition: Off. HasAccepted is already 0 on this PC, so this mainly keeps it that way.",
+      "sideEffects": "Cloud dictation (Win+H) stops working. Offline speech features are unaffected.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKCU", "path": "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy", "name": "HasAccepted", "valueType": "REG_DWORD", "value": 0, "default": null }
+      ]
+    },
+    {
+      "id": "disable-app-diagnostic-access",
+      "title": "Block Apps From Reading Diagnostic Info",
+      "description": "Store apps can no longer read diagnostic information about other running apps, such as which apps are open.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "Uses the documented App Privacy policy (Force Deny). Nothing on a typical gaming setup needs Store apps to see other apps.",
+      "sideEffects": "Store apps that list or manage other apps can no longer see them. Desktop programs are not affected.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy", "name": "LetAppsGetDiagnosticInfo", "valueType": "REG_DWORD", "value": 2, "default": null }
+      ]
+    },
+    {
+      "id": "disable-voice-activation",
+      "title": "Turn Off Voice Activation for Apps",
+      "description": "Stops apps from listening for a wake word, both while you are signed in and on the lock screen.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "Cortana is not used on this PC, so no app needs to listen for a wake word.",
+      "sideEffects": "Voice assistants can't be started by saying their wake word. Starting them by click or keyboard still works.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy", "name": "LetAppsActivateWithVoice", "valueType": "REG_DWORD", "value": 2, "default": null },
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy", "name": "LetAppsActivateWithVoiceAboveLock", "valueType": "REG_DWORD", "value": 2, "default": null }
+      ]
+    },
+    {
+      "id": "disable-settings-sync",
+      "title": "Turn Off Settings Sync",
+      "description": "Stops Windows from syncing your theme, language and other settings to your Microsoft account.",
+      "category": "privacy",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Removes a small amount of background sync traffic. No measurable effect on FPS.",
+      "recommended": false,
+      "recommendReason": "Only useful if you don't want settings shared across PCs. Not pre-selected because some people rely on sync.",
+      "sideEffects": "Theme, language preferences and other synced settings no longer roam to your other Windows PCs. Users can't turn sync back on in Settings while this policy is set.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\SettingSync", "name": "DisableSettingSync", "valueType": "REG_DWORD", "value": 2, "default": null },
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\SettingSync", "name": "DisableSettingSyncUserOverride", "valueType": "REG_DWORD", "value": 1, "default": null }
+      ]
+    },
+    {
+      "id": "disable-offline-maps-network",
+      "title": "Stop Offline Maps Background Downloads",
+      "description": "Turns off automatic downloading and updating of offline map data, and the unrequested network traffic from the Offline Maps settings page.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Removes occasional background downloads. No measurable effect on FPS.",
+      "recommended": true,
+      "recommendReason": "Pairs with the Maps service tweak. A gaming PC rarely needs offline maps.",
+      "sideEffects": "Downloaded offline maps stop updating automatically. You can still update them by hand in Settings.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Maps", "name": "AutoDownloadAndUpdateMapData", "valueType": "REG_DWORD", "value": 0, "default": null },
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Maps", "name": "AllowUntriggeredNetworkTrafficOnSettingsPage", "valueType": "REG_DWORD", "value": 0, "default": null }
+      ]
+    },
+    {
+      "id": "disable-app-launch-tracking",
+      "title": "Stop Tracking App Launches",
+      "description": "Windows stops recording which apps you open to personalise Start and search results.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "Matches Settings > Privacy > General > Let Windows track app launches: Off. It is currently on (Start_TrackProgs = 1).",
+      "sideEffects": "The Most used list in Start stops updating, and the Run dialog (Win+R) stops remembering commands you type.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKCU", "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "name": "Start_TrackProgs", "valueType": "REG_DWORD", "value": 0, "default": 1 }
+      ]
+    },
+    {
+      "id": "disable-device-metadata-download",
+      "title": "Stop Device Info Downloads",
+      "description": "Windows stops fetching device icons and descriptions from the internet for hardware you plug in.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": false,
+      "recommendReason": "Harmless, but the benefit is small, so it is not pre-selected.",
+      "sideEffects": "Devices and Printers may show generic icons and fewer details for new hardware. Driver installation is not affected.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata", "name": "PreventDeviceMetadataFromNetwork", "valueType": "REG_DWORD", "value": 1, "default": null }
+      ]
+    },
+    {
+      "id": "disable-font-providers",
+      "title": "Stop Online Font Downloads",
+      "description": "Windows stops downloading fonts on demand from Microsoft's font service. Fonts already installed keep working.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": false,
+      "recommendReason": "Small privacy gain. Not pre-selected because text in less common scripts may fall back to a different font.",
+      "sideEffects": "Apps that ask Windows for a font you don't have installed get a fallback font instead of a download.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System", "name": "EnableFontProviders", "valueType": "REG_DWORD", "value": 0, "default": null }
+      ]
+    },
+    {
+      "id": "windows-ink-workspace-off",
+      "title": "Turn Off Windows Ink Workspace",
+      "description": "Removes the pen workspace and its suggested-app tiles. A desktop with no pen never uses it.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Removes an unused feature. No measurable effect on FPS.",
+      "recommended": false,
+      "recommendReason": "This PC has no pen or touch screen, so nothing is lost. Not pre-selected because the gain is cosmetic.",
+      "sideEffects": "The Windows Ink Workspace button and Sketchpad shortcuts disappear.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-windowsinkworkspace"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\WindowsInkWorkspace", "name": "AllowWindowsInkWorkspace", "valueType": "REG_DWORD", "value": 0, "default": null },
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\WindowsInkWorkspace", "name": "AllowSuggestedAppsInWindowsInkWorkspace", "valueType": "REG_DWORD", "value": 0, "default": null }
+      ]
+    },
+    {
+      "id": "logon-background-clear",
+      "title": "Clear Sign-In Background",
+      "description": "Shows the sign-in screen background without the frosted blur effect.",
+      "category": "visual",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Purely cosmetic. The blur only runs on the sign-in screen, never in games.",
+      "recommended": false,
+      "recommendReason": "Matter of taste. Included because it is a documented policy, not because it speeds anything up.",
+      "sideEffects": "The sign-in screen looks sharper but less stylised.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-logon"
+      ],
+      "actions": [
+        { "type": "registry", "hive": "HKLM", "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System", "name": "DisableAcrylicBackgroundOnLogon", "valueType": "REG_DWORD", "value": 1, "default": null }
+      ]
+    },
+    {
+      "id": "reserved-storage-off",
+      "title": "Turn Off Reserved Storage",
+      "description": "Frees the space (about 7 GB) Windows keeps aside so updates always have room to install.",
+      "category": "storage",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Frees disk space only. No effect on FPS.",
+      "recommended": false,
+      "recommendReason": "The 1 TB MX500 has plenty of room, so the reserve is rarely needed, but it is not pre-selected because it protects updates on a full drive.",
+      "sideEffects": "If the drive fills up, Windows updates can fail to install. The change is refused while an update is in progress; try again after it finishes.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/powershell/module/dism/set-windowsreservedstoragestate",
+        "https://learn.microsoft.com/en-us/powershell/module/dism/get-windowsreservedstoragestate"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "Set-WindowsReservedStorageState -State Disabled",
+          "revert": "Set-WindowsReservedStorageState -State Enabled",
+          "detect": "(Get-WindowsReservedStorageState).ReservedStorageState -eq 'Disabled'"
+        }
+      ]
+    }
+  ]
+}

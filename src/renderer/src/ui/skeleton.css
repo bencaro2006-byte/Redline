@@ -1,0 +1,27 @@
+.rl-skeleton {
+  display: block;
+  background: linear-gradient(90deg, var(--rl-surface-2) 0%, #22262d 45%, var(--rl-surface-2) 90%);
+  background-size: 300% 100%;
+  animation: rl-shimmer 1.6s ease-in-out infinite;
+}
+
+.rl-skeleton-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@keyframes rl-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rl-skeleton {
+    animation: none;
+  }
+}

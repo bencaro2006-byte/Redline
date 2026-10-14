@@ -1,0 +1,50 @@
+.rl-games__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 16px;
+}
+
+.rl-game {
+  gap: 10px;
+}
+
+.rl-game__path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--rl-faint);
+}
+
+.rl-game__flags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rl-game__flag {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-top: 1px solid var(--rl-hairline);
+}
+
+.rl-game__flag-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rl-game__flag-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rl-game__flag-help {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--rl-muted);
+}

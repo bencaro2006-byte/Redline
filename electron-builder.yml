@@ -1,0 +1,50 @@
+appId: com.redline.optimizer
+productName: Redline Optimizer
+directories:
+  buildResources: build
+  output: release/${version}
+files:
+  - out/**/*
+  - package.json
+  - "!**/*.map"
+extraResources:                      # -> <install>/resources/...  (process.resourcesPath)
+  - from: resources/scripts
+    to: scripts
+    filter: ["**/*.ps1"]
+  - from: resources/icons
+    to: icons
+  - from: resources/licenses             # font licenses (SIL OFL 1.1) must ship with the fonts
+    to: licenses
+  - from: THIRD_PARTY_NOTICES.md
+    to: THIRD_PARTY_NOTICES.md
+  - from: LICENSE
+    to: LICENSE.txt
+asar: true
+npmRebuild: false                    # no native deps
+electronLanguages: [en-US]           # trims locale .pak files
+electronFuses:                       # @electron/fuses, flipped at package time
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableCookieEncryption: true
+  onlyLoadAppFromAsar: true
+  # enableEmbeddedAsarIntegrityValidation: true   # enable only after confirming the packaged exe still launches
+  # grantFileProtocolExtraPrivileges: leave default (true) - Vite's module scripts loaded via file:// need it
+win:
+  # Installer only: a portable build would run elevated out of a user-writable %TEMP% folder.
+  target:
+    - { target: nsis, arch: [x64] }
+  icon: build/icon.ico
+  executableName: RedlineOptimizer
+  requestedExecutionLevel: requireAdministrator   # only allowed under `win`, not per target
+  signAndEditExecutable: true        # KEEP: writes icon, version info AND the UAC level (via resedit)
+  signExecutable: false              # no certificate yet; resource editing still happens
+nsis:
+  oneClick: false
+  perMachine: true                   # Program Files (admin-write only)
+  allowToChangeInstallationDirectory: false   # always Program Files (admin-only); the app refuses to run elsewhere
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Redline Optimizer
+  runAfterFinish: true               # verify on a clean VM; set false if the post-install launch misbehaves
+  artifactName: ${name}-${version}-setup-${arch}.${ext}

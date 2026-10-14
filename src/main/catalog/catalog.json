@@ -1,0 +1,2382 @@
+{
+  "version": 1,
+  "generatedFor": "Intel Core i7-7700 / NVIDIA GTX 1070 / Gigabyte B250M-DS3H / Windows 10 Pro 22H2 (19045)",
+  "tweaks": [
+    {
+      "id": "ultimate-performance-plan",
+      "title": "Ultimate Performance Power Plan",
+      "description": "Copies Windows' hidden Ultimate Performance plan and makes it active. On mains power it sets the minimum processor state to 100%, never turns off the disk and turns off PCIe and SATA link power saving. On this PC its mains-power settings match High performance except that the disk never turns off.",
+      "category": "power",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Small at best. GPU-bound games should see no FPS change; CPU-heavy games may get slightly steadier frame times because the CPU never has to clock up first. On this PC its mains-power settings are identical to High performance apart from 'Turn off hard disk after: Never'.",
+      "recommended": true,
+      "recommendReason": "Mains-powered desktop whose 4-core i7-7700 can be the bottleneck in newer games, so the extra idle power is the only real cost. It already covers the minimum-processor-state, PCIe and SATA link tweaks, so those are not pre-selected separately.",
+      "sideEffects": "Higher idle power draw and CPU temperature; Microsoft notes it uses more power than Balanced. The plan never puts the PC to sleep on mains power (the display still turns off after 15 minutes), so set 'Sleep after' yourself if you rely on auto-sleep. Reverting re-activates your previous plan; the copied plan stays listed in Power Options.",
+      "requiresReboot": false,
+      "sources": [
+        "https://blogs.windows.com/windows-insider/2018/02/14/announcing-windows-10-insider-preview-build-17101-fast-build-17604-skip-ahead/",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "powerScheme",
+          "scheme": "ultimate"
+        }
+      ]
+    },
+    {
+      "id": "disable-power-throttling",
+      "title": "Disable Power Throttling",
+      "description": "Turns off Windows Power Throttling, which can run background apps at the CPU's most efficient, slower speeds. Uses the same registry value as the built-in 'Turn off Power Throttling' Group Policy.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "None expected on this PC. On Windows 10, Power Throttling only slows background apps on battery and only on CPUs that expose Intel Speed Shift; this PC's firmware exposes legacy ACPI P-states instead.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: this desktop always runs on mains power and does not expose Speed Shift, so Windows has nothing to throttle here.",
+      "sideEffects": "On a laptop running on battery, background apps can use more power. No noticeable effect on this desktop.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/procthread/quality-of-service",
+        "https://blogs.windows.com/windowsexperience/2017/04/18/introducing-power-throttling/"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+          "name": "PowerThrottlingOff",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "processor-min-state-100",
+      "title": "Processor Minimum State 100% (Plugged In)",
+      "description": "Sets the active power plan's minimum processor state to 100% on mains power, so Windows asks for full CPU speed (3.6 GHz base or higher) whenever a core is busy instead of ramping up from low clocks. Idle cores can still drop into their power-saving sleep states.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Small: during games the CPU is already busy and clocked up, so this mainly shortens clock ramp-up on short, bursty loads. Ultimate Performance already sets it.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected because the recommended Ultimate Performance plan already sets 100%; apply it on its own if you stay on Balanced (default 5%).",
+      "sideEffects": "Somewhat higher idle power and temperature; idle sleep states still work, so the increase is modest. Changes only the plan that is active when you apply it. Battery (DC) value is left at the default.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/options-for-perf-state-engine-minperformance",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "powercfg",
+          "subgroup": "54533251-82be-4824-96c1-47b60b740d00",
+          "setting": "893dee8e-2bef-41e0-89c6-b55d0929964c",
+          "ac": 100,
+          "dc": 5,
+          "defaultAc": 5,
+          "defaultDc": 5,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "id": "disable-usb-selective-suspend",
+      "title": "Disable USB Selective Suspend (Plugged In)",
+      "description": "Stops Windows from suspending idle USB devices while on mains power. Can fix controllers, headsets or wireless dongles that disconnect or respond late after sitting idle.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change; it only helps if a USB device drops out or lags when it wakes from idle.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: Microsoft strongly recommends leaving selective suspend on, and it only matters if one of this PC's USB devices misbehaves after idling.",
+      "sideEffects": "Idle USB devices stay powered, which can keep the CPU out of its deepest idle states and raise idle power slightly. Changes only the plan that is active when you apply it.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/usbcon/usb-selective-suspend",
+        "https://learn.microsoft.com/en-us/troubleshoot/microsoftteams/teams-rooms-and-devices/usb-selective-suspend-status-unhealthy"
+      ],
+      "actions": [
+        {
+          "type": "powercfg",
+          "subgroup": "2a737441-1930-4402-8d77-b2bebba308a3",
+          "setting": "48e6b7a6-50f5-4782-a5d4-53bb8f07e226",
+          "ac": 0,
+          "dc": 1,
+          "defaultAc": 1,
+          "defaultDc": 1,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "id": "disable-pcie-aspm",
+      "title": "Disable PCIe Link State Power Management",
+      "description": "Turns off PCI Express Active State Power Management (ASPM) on mains power, so PCIe links such as the GTX 1070's are not put into low-power states when idle. It only takes effect if the motherboard firmware lets Windows control ASPM.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No measurable FPS change: a PCIe link wakes up in microseconds. Ultimate Performance already sets Off.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected because Ultimate Performance already turns it off; harmless on this mains-powered desktop if you stay on Balanced (default Moderate).",
+      "sideEffects": "Slightly higher idle power draw. Changes only the plan that is active when you apply it. Battery (DC) value is left at the default.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/pci-express-settings-link-state-power-management",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "powercfg",
+          "subgroup": "501a4d13-42af-4429-9fd1-a8218c268e20",
+          "setting": "ee12f906-d277-404b-b6da-e5fa1a576df5",
+          "ac": 0,
+          "dc": 2,
+          "defaultAc": 1,
+          "defaultDc": 2,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "id": "disable-sata-link-power-management",
+      "title": "Disable SATA Link Power Management",
+      "description": "Sets AHCI link power management to Active on mains power, so the SATA link to the Crucial MX500 never enters its Partial or Slumber low-power states. Removes the short delay on the first access after an idle pause.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change. Waking a SATA link takes microseconds (Partial) up to about 10 ms (Slumber), so at most the first read after an idle pause is marginally quicker. Ultimate Performance already sets Active.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected because Ultimate Performance already sets it. The MX500, the only drive, runs on Microsoft's built-in storahci AHCI driver, which this setting is meant for.",
+      "sideEffects": "Slightly higher idle power for the SSD and SATA controller. Changes only the plan that is active when you apply it. Battery (DC) value is left at the default.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/disk-settings-link-power-management-mode---hipm-dipm",
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/storport/nf-storport-storportsetpowersettingnotificationguids",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "powercfg",
+          "subgroup": "0012ee47-9041-4b5d-9b77-535fba8b1442",
+          "setting": "0b2d69d7-a2a1-449c-9680-f91c70521c60",
+          "ac": 0,
+          "dc": 1,
+          "defaultAc": 1,
+          "defaultDc": 1,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "disable-fast-startup",
+      "title": "Disable Fast Startup",
+      "description": "Makes Shut down a full shutdown instead of saving the Windows kernel and drivers to hiberfil.sys for the next start. Every power-on after Shut down then starts drivers fresh, as Restart already does.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change, and no change on this PC today: Fast Startup needs hibernation, which is already off here. It only matters if hibernation is turned back on.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: Fast Startup is already unavailable on this PC because hibernation is off. Use this instead of disabling hibernation if you want to keep Hibernate.",
+      "sideEffects": "Power-on from Shut down is slower because Windows does a full boot. Takes effect from the next shutdown.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/configuration/unified-write-filter/hibernate-once-resume-many-horm",
+        "https://learn.microsoft.com/en-us/windows/win32/power/system-power-states"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+          "name": "HiberbootEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "id": "disable-hibernation",
+      "title": "Disable Hibernation",
+      "description": "Turns hibernation off and deletes hiberfil.sys, which also removes Fast Startup and hybrid sleep. Frees the disk space that file reserves, which grows with the amount of RAM.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change; the only gain is disk space. Hibernation is already off on this PC, so applying this changes nothing.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: hibernation is already off here, so there is nothing to gain. On a PC where it is on, it trades Fast Startup and hybrid sleep's protection against power cuts for several GB of disk space.",
+      "sideEffects": "Hibernate, hybrid sleep and Fast Startup become unavailable. Without hybrid sleep, a power cut while the PC is asleep loses unsaved work. Power-on from Shut down is slower. If hibernation was on before, reverting runs 'powercfg /hibernate on', which recreates hiberfil.sys.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-client/setup-upgrade-and-drivers/disable-and-re-enable-hibernation",
+        "https://learn.microsoft.com/en-us/windows/win32/power/system-power-states",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "& \"$env:SystemRoot\\System32\\powercfg.exe\" /hibernate off",
+          "revert": "& \"$env:SystemRoot\\System32\\powercfg.exe\" /hibernate on",
+          "detect": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power' -Name HibernateEnabled -ErrorAction SilentlyContinue).HibernateEnabled -eq 0"
+        }
+      ]
+    },
+    {
+      "id": "mmcss-system-responsiveness-10",
+      "title": "MMCSS System Responsiveness 10%",
+      "description": "Lowers the share of CPU time that the Multimedia Class Scheduler (MMCSS) keeps free for ordinary programs from 20% to 10%, the lowest value that takes effect. Threads that register with MMCSS, mainly audio and some game threads, can then stay boosted for longer before Windows holds them back.",
+      "category": "scheduling",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Usually not measurable: it only matters when MMCSS-registered threads are saturating the CPU, which is rare in games. Windows treats values below 10 as 20, so the popular setting of 0 does nothing.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: no measurable benefit is expected on this PC. If you want it, 10 is the lowest value Microsoft documents as taking effect, unlike the ineffective 0 found in many tweak guides.",
+      "sideEffects": "Background apps such as voice chat or streaming tools get a smaller guaranteed CPU share while MMCSS threads are saturating the CPU.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+          "name": "SystemResponsiveness",
+          "valueType": "REG_DWORD",
+          "value": 10,
+          "default": 20
+        }
+      ]
+    },
+    {
+      "id": "disable-network-throttling",
+      "title": "Disable Multimedia Network Throttling",
+      "description": "Sets NetworkThrottlingIndex to 0xFFFFFFFF so Windows stops limiting how many incoming network packets it processes while multimedia playback (MMCSS) is active. By default that limit is 10 packets per millisecond.",
+      "category": "network",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No effect on online games, whose traffic is far below 10,000 packets per second. At most it can speed up very fast LAN transfers made during media playback. Already set on this PC.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: it does nothing for game latency on this PC and only helps fast LAN copies during media playback.",
+      "sideEffects": "Very heavy network traffic during playback can cause audio or video glitches on weak CPUs; unlikely on an i7-7700.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/archive/blogs/markrussinovich/vista-multimedia-playback-and-network-throughput",
+        "https://learn.microsoft.com/en-us/answers/questions/2420607/ping-problems",
+        "https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+          "name": "NetworkThrottlingIndex",
+          "valueType": "REG_DWORD",
+          "value": 4294967295,
+          "default": 10
+        }
+      ]
+    },
+    {
+      "id": "mmcss-games-high-category",
+      "title": "MMCSS Games Task: High Category",
+      "description": "Moves the MMCSS 'Games' task from the Medium to the High scheduling category, so game threads that register with MMCSS as 'Games' run at priority 23-26 instead of 16-22.",
+      "category": "scheduling",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "No change in most games, because few games register their threads with MMCSS as 'Games'. Microsoft documents 'GPU Priority' and 'SFIO Priority' as unused and 'Priority' as always 2 in the High category, so only the category is changed.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: little benefit for most games on this PC and a small risk of crackling audio.",
+      "sideEffects": "Registered game threads would outrank Windows' normal audio threads (Medium category), which can cause crackling audio in games that keep those threads busy.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+          "name": "Scheduling Category",
+          "valueType": "REG_SZ",
+          "value": "High",
+          "default": "Medium"
+        }
+      ]
+    },
+    {
+      "id": "hardware-accelerated-gpu-scheduling",
+      "title": "Hardware-Accelerated GPU Scheduling",
+      "description": "Turns on Hardware-accelerated GPU scheduling, the switch under Settings > System > Display > Graphics settings. Frequent GPU scheduling work moves from the CPU to a scheduling processor on the GTX 1070; Windows still decides priorities. dxdiag on this PC reports it as supported (WDDM 2.7, driver 582.53).",
+      "category": "gpu",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Usually nothing you can measure: Microsoft says users should not notice significant changes, and NVIDIA says only that it can potentially improve performance and latency. Already on for this PC.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: it is already on here, the benefit is unproven, and results can differ between games, so whether to keep it is your call.",
+      "sideEffects": "If a game, capture tool or VR app stutters or misbehaves with it on, revert it. Reverting restores the previous state; resetting to Windows defaults removes the value, which means off on Windows 10. Microsoft documents the Settings switch, not this registry value; HwSchMode=2 is what that switch wrote on this PC.",
+      "requiresReboot": true,
+      "sources": [
+        "https://devblogs.microsoft.com/directx/hardware-accelerated-gpu-scheduling/",
+        "https://www.nvidia.com/en-us/geforce/news/directx-12-ultimate-game-ready-driver/"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "name": "HwSchMode",
+          "valueType": "REG_DWORD",
+          "value": 2,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-paging-executive",
+      "title": "Keep Kernel and Drivers in RAM",
+      "description": "Sets DisablePagingExecutive so kernel-mode drivers and Windows system code always stay in RAM instead of being paged out to disk when unused.",
+      "category": "scheduling",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Usually not measurable: with 32 GB of RAM Windows seldom pages kernel code out, so at most it avoids an occasional disk read after long idle periods. Microsoft's performance note for this value dates from Windows Server 2003.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: no measurable gain is expected with 32 GB of RAM. Harmless to apply if you want it, since the memory it pins is a tiny fraction of 32 GB.",
+      "sideEffects": "Kernel code and drivers permanently use a little more RAM.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc757875(v=ws.10)",
+        "https://learn.microsoft.com/en-us/archive/blogs/irenak/sysk-318-registry-key-that-controls-device-driver-and-system-code-pagination-to-disk"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+          "name": "DisablePagingExecutive",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "game-dvr-background-recording-off",
+      "title": "Turn Off Windows Game Recording",
+      "description": "Sets Microsoft's documented 'Windows Game Recording and Broadcasting' policy to Disabled. Game Bar can no longer record clips, take screenshots or record in the background ('Record what happened') for any account on this PC.",
+      "category": "gaming",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS gain unless background recording had been switched on. It is off by default in Windows 10 22H2 and is already off on this PC. When it is on, Windows keeps encoding the last few minutes of gameplay in the background, and this policy stops that.",
+      "recommended": false,
+      "recommendReason": "Not needed on this PC: background recording is already off, so the policy would only remove Game Bar's capture features. Apply it if you never use Game Bar captures and want recording kept off for every account.",
+      "sideEffects": "Game Bar clip recording, screenshots and shortcuts such as Win+Alt+R stop working for every account, and the Captures settings page says some settings are managed by your organization. Other capture tools, such as NVIDIA's overlay, Steam or OBS, are not affected. Takes full effect after a restart.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR",
+          "name": "AllowGameDVR",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "xbox-game-bar-off",
+      "title": "Turn Off Xbox Game Bar",
+      "description": "Turns off Xbox Game Bar for your account and stops a controller's Xbox button from opening it. Win+G no longer opens the overlay, so it can't pop up over a game by accident.",
+      "category": "gaming",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS gain expected: Game Bar does no work until you open it or start a recording. The only benefit is that the overlay can't interrupt a game.",
+      "recommended": false,
+      "recommendReason": "Optional. Worth applying only if Game Bar opens by accident or you never use it. Keep it on if you use Xbox party chat, game invites or Game Bar's performance and audio widgets.",
+      "sideEffects": "Win+G, Game Bar captures and the Game Bar widgets (performance, audio, Xbox social) stop working, and Xbox party chat and game invites that appear through Game Bar won't show. Other overlays, such as NVIDIA's or Steam's, are not affected. Fully applies after a restart.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/answers/questions/5892017/need-to-prevent-gamebar-from-opening-ever-under-an",
+        "https://github.com/The-Virtual-Desktop-Team/Virtual-Desktop-Optimization-Tool/blob/main/2009/ConfigurationFiles/DefaultUserSettings.json",
+        "https://learn.microsoft.com/en-us/answers/questions/443550/my-xbox-game-bar-automatically-disabled-and-doesnt"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
+          "name": "AppCaptureEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "System\\GameConfigStore",
+          "name": "GameDVR_Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\GameBar",
+          "name": "UseNexusForGameBarEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "xbox-live-services-off",
+      "title": "Disable Xbox Live Services",
+      "description": "Sets the Xbox Live Auth Manager, Xbox Live Game Save and Xbox Live Networking services to Disabled and turns off the Xbox game-save sync task, so they can't start even when a game asks for them. Only for PCs that never use Xbox or Game Pass PC games.",
+      "category": "services",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Little to gain: on Windows 10 22H2 these services are set to Manual and stay stopped until an Xbox-enabled game or app starts them. On this PC all three are Manual and stopped, so disabling them frees nothing day to day.",
+      "recommended": false,
+      "recommendReason": "Not worth it by default: the services cost nothing while stopped, and disabling them breaks Xbox sign-in. Apply only if you never play Game Pass, Microsoft Store or Xbox-enabled games.",
+      "sideEffects": "Xbox app and Game Pass sign-in, Xbox cloud saves, achievements, and Xbox multiplayer and party features stop working until reverted, including in games sold elsewhere (some Steam games) that sign in with an Xbox account. Microsoft notes that with Xbox Live Game Save stopped, save data won't upload to or download from Xbox Live. The Xbox Accessory Management service is left alone, so Xbox controllers keep working.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/security/windows-services/security-guidelines-for-disabling-system-services-in-windows-server",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "service",
+          "name": "XblAuthManager",
+          "startType": "Disabled",
+          "default": "Manual"
+        },
+        {
+          "type": "service",
+          "name": "XblGameSave",
+          "startType": "Disabled",
+          "default": "Manual"
+        },
+        {
+          "type": "service",
+          "name": "XboxNetApiSvc",
+          "startType": "Disabled",
+          "default": "Manual"
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\XblGameSave\\XblGameSaveTask",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "enhance-pointer-precision-off",
+      "title": "Turn Off Enhance Pointer Precision",
+      "description": "Turns off Windows mouse acceleration ('Enhance pointer precision'), so the pointer moves the same distance for the same hand movement however fast you move the mouse. Keeps aim consistent on the desktop and in games that use the Windows pointer instead of raw input.",
+      "category": "input",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change. Games that read raw mouse input, which includes most modern first-person shooters, already bypass Windows acceleration, so the difference shows on the desktop and in cursor-driven or older games.",
+      "recommended": true,
+      "recommendReason": "Acceleration is on by default in Windows 10 22H2 and is on for this PC. Turning it off makes the desktop and cursor-driven games behave like raw-input games, which helps muscle memory. It's a feel change rather than a speed gain, so untick it if you prefer the pointer as it is.",
+      "sideEffects": "The pointer can feel slower when you move the mouse quickly, especially with a low-DPI mouse on a large screen; raise the pointer speed or the mouse's DPI to compensate. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978664(v=technet.10)",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978665(v=technet.10)",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978667(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows/win32/dxtecharts/taking-advantage-of-high-dpi-mouse-movement"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Mouse",
+          "name": "MouseSpeed",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "1"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Mouse",
+          "name": "MouseThreshold1",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "6"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Mouse",
+          "name": "MouseThreshold2",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "10"
+        }
+      ]
+    },
+    {
+      "id": "keyboard-repeat-fast",
+      "title": "Faster Keyboard Repeat",
+      "description": "Shortens the delay before a held key starts repeating to the minimum (about 250 ms, down from the default of about 500 ms) and keeps the repeat rate at its fastest (about 30 per second, which is already the default).",
+      "category": "input",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Feel only: games track whether a key is held down, not repeated characters, so movement and FPS are unaffected. Only text fields, chat and consoles notice the change.",
+      "recommended": false,
+      "recommendReason": "Personal preference; nothing about this PC's hardware calls for it, and a short delay can cause accidental repeats for slower typists.",
+      "sideEffects": "Holding a key slightly too long may type extra characters. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978658(v=technet.10)",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978659(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Keyboard",
+          "name": "KeyboardDelay",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "1"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Keyboard",
+          "name": "KeyboardSpeed",
+          "valueType": "REG_SZ",
+          "value": "31",
+          "default": "31"
+        }
+      ]
+    },
+    {
+      "id": "accessibility-hotkeys-off",
+      "title": "Turn Off Sticky/Filter/Toggle Keys Shortcuts",
+      "description": "Turns off the keyboard shortcuts that switch on Sticky Keys (press Shift five times), Filter Keys (hold right Shift for eight seconds) and Toggle Keys (hold Num Lock for five seconds). Their confirmation pop-up can pull you out of a fullscreen game. The features themselves stay available in Settings.",
+      "category": "input",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change; it removes an interruption, not a bottleneck.",
+      "recommended": true,
+      "recommendReason": "Shift is a common sprint or crouch key, and these shortcuts are on by default in Windows 10 22H2, so the pop-up can appear mid-game on this PC. Nothing else changes.",
+      "sideEffects": "Anyone who relies on these shortcuts will need to turn the features on from Settings > Ease of Access > Keyboard instead. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-stickykeys",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-filterkeys",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-togglekeys",
+        "https://learn.microsoft.com/en-us/archive/blogs/embedded/stickykeys"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Accessibility\\StickyKeys",
+          "name": "Flags",
+          "valueType": "REG_SZ",
+          "value": "506",
+          "default": "510"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Accessibility\\Keyboard Response",
+          "name": "Flags",
+          "valueType": "REG_SZ",
+          "value": "122",
+          "default": "126"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Accessibility\\ToggleKeys",
+          "name": "Flags",
+          "valueType": "REG_SZ",
+          "value": "58",
+          "default": "62"
+        }
+      ]
+    },
+    {
+      "id": "visual-effects-performance",
+      "title": "Reduce Desktop Visual Effects",
+      "description": "Turns off menu, combo-box, list-box, tooltip and in-window control animations, selection fades, translucent selection rectangles, desktop icon-label shadows and Aero Peek. Font smoothing and window shadows stay on, so text stays crisp. Based on the settings Microsoft uses to slim down Windows for virtual desktops.",
+      "category": "visual",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No in-game FPS change and no measurable desktop gain on a GTX 1070; menus simply appear without animating. Microsoft recommends these settings for virtual desktops, where every redraw is sent over the network, not for gaming PCs.",
+      "recommended": false,
+      "recommendReason": "Preference only: the GTX 1070 and i7-7700 draw these effects without effort, so apply it only if you prefer menus that appear instantly.",
+      "sideEffects": "Menus and tooltips appear without animation, desktop icon labels lose their shadow (harder to read on a light wallpaper), hovering over Show desktop or a taskbar preview no longer peeks at windows, and Performance Options shows 'Custom'. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc957204(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+          "name": "VisualFXSetting",
+          "valueType": "REG_DWORD",
+          "value": 3,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Desktop",
+          "name": "UserPreferencesMask",
+          "valueType": "REG_BINARY",
+          "value": "9012078010000000",
+          "default": "9e1e078012000000"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "ListviewAlphaSelect",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "ListviewShadow",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\DWM",
+          "name": "EnableAeroPeek",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Desktop",
+          "name": "FontSmoothing",
+          "valueType": "REG_SZ",
+          "value": "2",
+          "default": "2"
+        }
+      ]
+    },
+    {
+      "id": "window-animations-off",
+      "title": "Turn Off Window Animations",
+      "description": "Turns off the minimize, maximize and restore animations and the taskbar animations, so windows change state instantly.",
+      "category": "visual",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change; it only skips a short animation, so minimizing and restoring windows feels more immediate.",
+      "recommended": false,
+      "recommendReason": "Preference only: the GTX 1070 draws these animations without effort, so turning them off frees no performance on this PC. Apply it if you prefer instant window changes.",
+      "sideEffects": "Windows appear and disappear abruptly. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc938230(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Desktop\\WindowMetrics",
+          "name": "MinAnimate",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "1"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "TaskbarAnimations",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "id": "menu-show-delay-short",
+      "title": "Shorten Menu Show Delay",
+      "description": "Cuts the pause before a submenu opens when you hover over it from 400 ms (the Windows default) to 100 ms. Affects submenus in right-click menus and classic app menus.",
+      "category": "visual",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Desktop feel only; no effect on games or FPS.",
+      "recommended": false,
+      "recommendReason": "Preference only; nothing about this PC's hardware calls for it. 100 ms keeps a small buffer so submenus don't open just because the pointer passes over them.",
+      "sideEffects": "Submenus open sooner when the pointer passes over them. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978617(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Desktop",
+          "name": "MenuShowDelay",
+          "valueType": "REG_SZ",
+          "value": "100",
+          "default": "400"
+        }
+      ]
+    },
+    {
+      "id": "tcp-delayed-ack-off",
+      "title": "Disable TCP Delayed ACK",
+      "description": "Sets TcpAckFrequency to 1 on your physical network adapters, so Windows acknowledges every incoming TCP segment right away. By default Windows acknowledges every second segment, or when a 200 ms timer runs out if no second segment arrives. Immediate ACKs only help when an app sends small TCP messages with the Nagle algorithm on and ends up waiting for a delayed ACK.",
+      "category": "network",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Only affects TCP traffic. Most fast-paced online games use UDP, and TCP games can turn off Nagle themselves (TCP_NODELAY), so most games see no change.",
+      "recommended": false,
+      "recommendReason": "Microsoft advises against changing this default without careful study, and it only helps specific TCP-based apps. Leave it off unless a TCP game or app feels sluggish on your wired gigabit connection.",
+      "sideEffects": "Sends more ACK packets, which is negligible on wired gigabit Ethernet. Applies only to adapters present when you turn it on, so turn it off and on again after adding a new adapter. Turning it off removes TcpAckFrequency from every network interface, including any value you set before using Redline.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/registry-entry-control-tcp-acknowledgment-behavior",
+        "https://learn.microsoft.com/en-us/windows/win32/winsock/ipproto-tcp-socket-options"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "Get-NetAdapter -Physical | ForEach-Object { 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\' + $_.InterfaceGuid } | Where-Object { Test-Path $_ } | ForEach-Object { New-ItemProperty -Path $_ -Name 'TcpAckFrequency' -PropertyType DWord -Value 1 -Force | Out-Null }",
+          "revert": "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { Remove-ItemProperty -Path $_.PSPath -Name 'TcpAckFrequency' -ErrorAction SilentlyContinue }",
+          "detect": "$k = @(Get-NetAdapter -Physical | ForEach-Object { 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\' + $_.InterfaceGuid } | Where-Object { Test-Path $_ }); ($k.Count -gt 0) -and -not ($k | Where-Object { (Get-ItemProperty -Path $_).TcpAckFrequency -ne 1 })"
+        }
+      ]
+    },
+    {
+      "id": "nic-eee-off",
+      "title": "Disable Energy-Efficient Ethernet",
+      "description": "Turns off IEEE 802.3az Energy-Efficient Ethernet (EEE) on your wired network adapters. EEE lets the link drop into a low-power idle state between bursts of traffic and wake up again within microseconds. With it off, the link stays fully powered all the time.",
+      "category": "network",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "EEE wake-up delays are measured in microseconds, far below anything you can notice in a game, so expect no measurable change in latency or FPS. It is mainly a troubleshooting step for router and adapter combinations that drop the link or stutter with EEE on.",
+      "recommended": false,
+      "recommendReason": "Your Realtek PCIe GbE adapter has EEE enabled, but on a working wired connection turning it off brings no measurable gain. Only worth trying if you see link drops or network stutter.",
+      "sideEffects": "The adapter restarts when the setting changes, dropping the connection for a few seconds. Idle power use rises slightly. Realtek's separate Green Ethernet and Power Saving Mode options are left unchanged.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/network/standardized-inf-keywords-for-power-management",
+        "https://learn.microsoft.com/en-us/powershell/module/netadapter/set-netadapteradvancedproperty"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "@(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*EEE' }) | Set-NetAdapterAdvancedProperty -RegistryValue 0",
+          "revert": "@(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*EEE' }) | Reset-NetAdapterAdvancedProperty",
+          "detect": "$p = @(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*EEE' }); ($p.Count -gt 0) -and -not ($p | Where-Object { ($_.RegistryValue -join '') -ne '0' })"
+        }
+      ]
+    },
+    {
+      "id": "nic-interrupt-moderation-off",
+      "title": "Disable NIC Interrupt Moderation",
+      "description": "Turns off interrupt moderation on your wired network adapters, so the adapter interrupts the CPU for packets right away instead of batching several packets into one interrupt. Microsoft lists this as a tuning step for networks that need the lowest possible latency, and notes that it uses more CPU time.",
+      "category": "network",
+      "risk": "advanced",
+      "impact": "low",
+      "impactNote": "Microsoft notes that this kind of tuning cuts processing delay measured in microseconds and does not reduce the milliseconds a packet spends in transit, so expect no noticeable change in online games.",
+      "recommended": false,
+      "recommendReason": "Your online ping is measured in milliseconds while this saves microseconds, and the extra interrupts land on a 4-core/8-thread i7-7700 that games already keep busy.",
+      "sideEffects": "Higher CPU and interrupt load during heavy network traffic, such as large game downloads. The adapter restarts when the setting changes, dropping the connection for a few seconds.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/networking/technologies/network-subsystem/net-sub-performance-tuning-nics",
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/network/enumeration-keywords"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "@(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*InterruptModeration' }) | Set-NetAdapterAdvancedProperty -RegistryValue 0",
+          "revert": "@(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*InterruptModeration' }) | Reset-NetAdapterAdvancedProperty",
+          "detect": "$p = @(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*InterruptModeration' }); ($p.Count -gt 0) -and -not ($p | Where-Object { ($_.RegistryValue -join '') -ne '0' })"
+        }
+      ]
+    },
+    {
+      "id": "delivery-optimization-p2p-off",
+      "title": "Turn Off Update Peer-to-Peer Sharing",
+      "description": "Sets the Delivery Optimization download mode to HTTP only through Group Policy. Windows and Store updates then download only from Microsoft's servers and are not shared with other PCs. Windows Update keeps working normally.",
+      "category": "network",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Peer sharing is already off on this PC: Delivery Optimization reports HTTP-only (CdnOnly) mode from your Settings choice, so applying this only locks that choice in policy. Even in the Windows default (LAN) mode, sharing only happens with PCs on your own network, not over the internet.",
+      "recommended": false,
+      "recommendReason": "Peer sharing is already turned off in Settings on this PC, so the policy adds nothing except a 'managed by your organization' notice.",
+      "sideEffects": "While this is on, Windows Settings shows the Delivery Optimization option as managed by your organization and you cannot change it there. Other PCs on your network can no longer fetch updates from this one.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-deliveryoptimization"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+          "name": "DODownloadMode",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "sysmain-off",
+      "title": "Disable SysMain (Superfetch)",
+      "description": "Disables the SysMain service (formerly Superfetch), which learns which apps you use and preloads them into spare RAM. On an SSD this mostly removes some background disk and CPU activity. It does not make games run faster.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "On a SATA SSD with 32 GB of RAM the difference is usually unmeasurable either way. Microsoft's guidance is to evaluate SysMain for each setup rather than turn it off by default.",
+      "recommended": false,
+      "recommendReason": "With 32 GB of RAM, SysMain's preloading uses memory that would otherwise sit idle, and your MX500 SSD makes both its benefit and its cost small, so there is little reason to change it.",
+      "sideEffects": "App preloading stops, so frequently used apps may open slightly slower after a reboot. Memory compression is reported to rely on SysMain, so it may stop working while SysMain is disabled.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "service",
+          "name": "SysMain",
+          "startType": "Disabled",
+          "default": "Automatic"
+        }
+      ]
+    },
+    {
+      "id": "windows-search-manual",
+      "title": "Set Windows Search Indexing to Manual",
+      "description": "Changes the Windows Search service from starting automatically (delayed) at boot to Manual. The indexer then runs only after an app that uses Windows Search asks for it. This removes indexing work after boot, at the cost of slower or less complete searches until the service starts.",
+      "category": "storage",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Once your files are indexed the indexer is mostly idle, and apps that use Windows Search can still start it on demand, so it may end up running anyway. Expect no change in games.",
+      "recommended": false,
+      "recommendReason": "Your MX500 SSD handles indexing easily, and Start, File Explorer, Outlook and Edge history search on this PC rely on the index, so the trade-off is not worth it.",
+      "sideEffects": "Start menu and File Explorer searches can be slower or skip file contents until the service starts. Microsoft lists only the Automatic start types as correct for Outlook search, so Outlook may report search as unavailable. Microsoft Edge also uses the index for address-bar history results.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://support.microsoft.com/en-us/windows/search-indexing-in-windows-faq-da061c83-af6b-095c-0f7a-4dfecda4d15a",
+        "https://support.microsoft.com/en-US/Outlook/why-is-desktop-search-service-unavailable"
+      ],
+      "actions": [
+        {
+          "type": "service",
+          "name": "WSearch",
+          "startType": "Manual",
+          "default": "AutomaticDelayed"
+        }
+      ]
+    },
+    {
+      "id": "memory-compression-off",
+      "title": "Disable Memory Compression",
+      "description": "Turns off memory compression, which Windows uses to compress rarely used memory pages in RAM instead of writing them to the page file. With plenty of RAM, compression rarely happens, so there is little work to remove.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "With 32 GB, little memory gets compressed in the first place, so expect no measurable FPS change.",
+      "recommended": false,
+      "recommendReason": "With 32 GB of RAM this PC rarely compresses memory, so there is little CPU work on the i7-7700 to save. Only worth trying if you see memory compression using CPU while you game.",
+      "sideEffects": "If RAM does fill up, Windows writes more pages to the page file on your SSD instead of compressing them, and reading them back is slower. Memory compression is reported to rely on the SysMain service, so if SysMain is disabled this setting may already make no difference.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/powershell/module/mmagent/disable-mmagent",
+        "https://learn.microsoft.com/en-us/powershell/module/mmagent/get-mmagent"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "Disable-MMAgent -MemoryCompression",
+          "revert": "Enable-MMAgent -MemoryCompression",
+          "detect": "(Get-MMAgent).MemoryCompression -eq $false"
+        }
+      ]
+    },
+    {
+      "id": "ntfs-last-access-off",
+      "title": "Disable NTFS Last-Access Timestamps",
+      "description": "Stops NTFS from updating a file's 'last accessed' time when the file is read, which removes small metadata writes.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "fsutil on this PC already reports last-access updates as 'System Managed, Disabled', so this changes nothing here. On PCs where they are on, the gain is small.",
+      "recommended": false,
+      "recommendReason": "Windows already has last-access updates turned off on your 1 TB MX500 system drive by default, so there is nothing to gain.",
+      "sideEffects": "Programs that rely on last-access times, such as some backup and archiving tools, lose that information. Switches the setting from system-managed to always off; turning the tweak off restores system-managed mode.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+          "name": "NtfsDisableLastAccessUpdate",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": 2147483650
+        }
+      ]
+    },
+    {
+      "id": "ntfs-8dot3-off",
+      "title": "Disable 8.3 Short File Names",
+      "description": "Stops NTFS from creating an extra old-style 8.3 short name (like PROGRA~1) for each new file or folder with a long name, on every drive. NTFS then has one less name to generate and check when it creates files.",
+      "category": "storage",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Only measurable when creating files in folders that hold many thousands of files. Game load times and FPS are unaffected.",
+      "recommended": false,
+      "recommendReason": "Your MX500 SSD already creates files quickly, and C: is your only drive, where some older installers and apps still expect short names.",
+      "sideEffects": "Very old programs and some legacy installers that rely on short names may fail with newly created files and folders. Existing short names are kept. Takes effect after a restart.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-8dot3name",
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+          "name": "NtfsDisable8dot3NameCreation",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": 2
+        }
+      ]
+    },
+    {
+      "id": "ssd-trim-on",
+      "title": "Make Sure SSD TRIM Is Enabled",
+      "description": "Makes sure NTFS sends TRIM (delete notifications) to your SSD and that the weekly Optimize Drives task, which re-sends TRIM for all free space on SSDs, stays enabled. TRIM tells the SSD which blocks are no longer in use, which helps keep its write speed consistent over time.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Already on here (DisableDeleteNotify = 0 and the ScheduledDefrag task is Ready), so this changes nothing. It is a safeguard that only matters if another tool had turned TRIM off.",
+      "recommended": true,
+      "recommendReason": "Your Crucial MX500 is a SATA SSD that supports TRIM. This matches the Windows default and is already in effect, so keeping it selected costs nothing.",
+      "sideEffects": "None. This is the Windows default.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior",
+        "https://learn.microsoft.com/en-us/powershell/module/storage/optimize-volume"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+          "name": "DisableDeleteNotification",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 0
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Defrag\\ScheduledDefrag",
+          "enabled": true,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "diagnostic-data-required",
+      "title": "Limit Diagnostic Data to Required",
+      "description": "Sets the Allow Diagnostic Data policy to Required, so Windows never sends Optional diagnostic data (detailed app usage, browsing and enhanced error reports). This is a privacy setting; it does not change game performance.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only, no measurable FPS or latency change. Pro can't go lower: Microsoft treats the 'off' level (0) as Required on Pro, so 1 is the real minimum.",
+      "recommended": true,
+      "recommendReason": "Diagnostic data on your PC is already at the lowest level Windows 10 Pro allows, so nothing changes today. The policy locks it there so a setup prompt or settings reset can't turn Optional data back on.",
+      "sideEffects": "Settings shows 'Some settings are managed by your organization'. The Windows Insider Program needs Optional data, so it stops offering preview builds.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#allowtelemetry",
+        "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+          "name": "AllowTelemetry",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-ceip",
+      "title": "Turn Off Customer Experience Program",
+      "description": "Opts the PC out of the legacy Windows Customer Experience Improvement Program by policy and disables its three data-collection tasks (Consolidator, USB CEIP and the Autochk proxy).",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Negligible. These are short, low-priority jobs (Consolidator runs every few hours); removing them won't change FPS.",
+      "recommended": true,
+      "recommendReason": "All three tasks exist and are enabled on your Windows 10 22H2 install, and CEIP has been superseded by the diagnostic data settings, so nothing useful is lost.",
+      "sideEffects": "None noticeable.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-icm#ceipenable",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
+          "name": "CEIPEnable",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Autochk\\Proxy",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "disable-compatibility-appraiser",
+      "title": "Disable Compatibility Appraiser Tasks",
+      "description": "Disables the Microsoft Compatibility Appraiser and ProgramDataUpdater tasks, which run CompatTelRunner.exe to inventory apps and drivers for upgrade compatibility and diagnostic data. That scan can briefly load the CPU and disk.",
+      "category": "privacy",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Removes an occasional CompatTelRunner scan at low priority. You'll only notice a difference if it used to kick in while you were playing.",
+      "recommended": true,
+      "recommendReason": "Your i7-7700 isn't on Microsoft's Windows 11 supported CPU list, so upgrade appraisal has nothing to offer this PC. The task still runs daily, and because it catches up right after boot when the PC was off at 3 AM, it can land at the start of a gaming session.",
+      "sideEffects": "Windows can no longer assess this PC for OS upgrades, and Microsoft doesn't document everything that uses appraiser data. Turn it back on before an in-place upgrade or if Windows Update reports a compatibility problem. A cumulative update may re-enable the task.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/minimum/supported/windows-11-supported-intel-processors"
+      ],
+      "actions": [
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Application Experience\\Microsoft Compatibility Appraiser",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Application Experience\\ProgramDataUpdater",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "disable-feedback-prompts",
+      "title": "Stop Windows Feedback Requests",
+      "description": "Turns off Windows feedback notifications by policy, sets feedback frequency to Never and disables the two tasks that download feedback survey content, so survey pop-ups don't appear mid-session.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Removes occasional survey notifications; no performance effect.",
+      "recommended": true,
+      "recommendReason": "Your account's survey count is already set to 0, but the policy isn't set and both survey-download tasks are still enabled on your PC.",
+      "sideEffects": "Feedback Hub still works if you open it yourself.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#donotshowfeedbacknotifications",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+          "name": "DoNotShowFeedbackNotifications",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Siuf\\Rules",
+          "name": "PeriodInNanoSeconds",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Siuf\\Rules",
+          "name": "NumberOfSIUFInPeriod",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClient",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClientOnScenarioDownload",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "disable-advertising-id",
+      "title": "Turn Off Advertising ID",
+      "description": "Disables the advertising ID by policy, so apps can't use it to link your activity across apps for personalized ads.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only; no performance effect.",
+      "recommended": true,
+      "recommendReason": "The advertising ID is already off for your account. The policy (supported on Windows 10 Pro) keeps it off for every account on this PC and stops a setup prompt from turning it back on.",
+      "sideEffects": "Ads in apps become less personalized, not fewer. The Settings toggle is greyed out.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#disableadvertisingid",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\AdvertisingInfo",
+          "name": "DisabledByGroupPolicy",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-tailored-experiences",
+      "title": "Turn Off Tailored Experiences",
+      "description": "Stops Microsoft from using your diagnostic data to personalize tips, ads and recommendations in Windows.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only; no performance effect.",
+      "recommended": true,
+      "recommendReason": "Tailored experiences are already off for your account. The policy (supported on Windows 10 Pro) keeps it off even if an update or setup prompt tries to turn it back on.",
+      "sideEffects": "The Tailored experiences toggle in Settings shows as managed by your organization.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#allowtailoredexperienceswithdiagnosticdata",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Policies\\Microsoft\\Windows\\CloudContent",
+          "name": "DisableTailoredExperiencesWithDiagnosticData",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-activity-history",
+      "title": "Turn Off Activity History",
+      "description": "Stops Windows from recording the apps and files you use for Timeline, and from publishing or uploading that activity history.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only. Microsoft already stopped syncing activity history to the cloud (2021 for Microsoft accounts), so this mainly stops local Timeline logging.",
+      "recommended": true,
+      "recommendReason": "These three policies are already set on your PC, so applying this changes nothing. It's listed so Redline can detect and show the setting.",
+      "sideEffects": "Timeline (Win+Tab) no longer shows past activities.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#enableactivityfeed",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
+        "https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "EnableActivityFeed",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "PublishUserActivities",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "UploadUserActivities",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-cortana",
+      "title": "Turn Off Cortana and Search Location",
+      "description": "Disables Cortana and stops Windows Search from using your location, by policy. The standalone Cortana app is retired on Windows 10, so this mainly removes leftover integration.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Little to no effect: Microsoft deprecated the standalone Cortana app in June 2023 and it no longer works. The location policy is a small privacy gain.",
+      "recommended": false,
+      "recommendReason": "Nothing to gain on your PC: the retired Cortana app no longer works, its taskbar button is already hidden, and location access is already off (the Location service is disabled). Turn it on only if you want both locked off by policy.",
+      "sideEffects": "Cortana can't be launched. Windows Search keeps working for local apps, settings and files.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#allowcortana",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search#allowsearchtouselocation",
+        "https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
+          "name": "AllowCortana",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
+          "name": "AllowSearchToUseLocation",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-search-highlights",
+      "title": "Turn Off Search Highlights and Suggestions",
+      "description": "Turns off search highlights (trending searches and daily content) in Windows search and stops File Explorer from saving and suggesting your past searches, both by policy.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No effect on games. Many users report the Explorer policy also removes Bing web results from taskbar search on Windows 10 2004 and later, but Microsoft doesn't document that, so don't count on it.",
+      "recommended": true,
+      "recommendReason": "Search highlights are already off for your account; the policy keeps them off. The part that changes something here is the File Explorer policy, which stops it saving your past searches. Microsoft's 'Don't search the web' policy isn't supported on Windows 10 Pro.",
+      "sideEffects": "File Explorer's search box stops suggesting your recent searches. Sign out and back in for it to take effect.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-windowsexplorer#disablesearchboxsuggestions",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search#allowsearchhighlights",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search#donotusewebresults"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+          "name": "DisableSearchBoxSuggestions",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
+          "name": "EnableDynamicContentInWSB",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-tips-suggestions",
+      "title": "Turn Off Tips, Suggestions and Setup Nags",
+      "description": "Turns off Start menu app suggestions, 'tips and tricks' notifications, suggested content in Settings, 'finish setting up your device' prompts and third-party Spotlight suggestions for your account.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Removes ads and nag pop-ups; no performance effect.",
+      "recommended": true,
+      "recommendReason": "These suggestions are all still on for your account, and the machine-wide policy for them ('Turn off Microsoft consumer experiences', already set on your PC) is ignored on Windows 10 Pro.",
+      "sideEffects": "You also stop getting Microsoft's tips about Windows features.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#allowwindowsconsumerfeatures",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#allowthirdpartysuggestionsinwindowsspotlight"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-338388Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SystemPaneSuggestionsEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-338389Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-338393Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-353694Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-353696Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\UserProfileEngagement",
+          "name": "ScoobeSystemSettingEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Policies\\Microsoft\\Windows\\CloudContent",
+          "name": "DisableThirdPartySuggestions",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "hide-people-bar",
+      "title": "Remove People From the Taskbar",
+      "description": "Removes the My People button and its settings toggle from the taskbar by policy. My People is a deprecated feature that Microsoft stopped developing in version 1909.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Cosmetic: removes the People button (if it's showing) and its taskbar setting. No performance effect.",
+      "recommended": true,
+      "recommendReason": "My People is deprecated (no longer developed since version 1909) but still ships in Windows 10 22H2, and its PeopleExperienceHost component is installed on your PC. It does nothing for gaming.",
+      "sideEffects": "You can't pin contacts to the taskbar. Sign out and back in for it to take effect.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-start#hidepeoplebar",
+        "https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+          "name": "HidePeopleBar",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-news-and-interests",
+      "title": "Turn Off News and Interests",
+      "description": "Removes the weather and news button from the taskbar by policy, along with the web feed it loads in the background.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change. Saves the feed's background memory and network use only while the feed is active.",
+      "recommended": false,
+      "recommendReason": "Windows already reports the feed as disabled on your PC because the Edge browser isn't installed, so this changes nothing today. Turn it on if Edge comes back and you don't want the feed.",
+      "sideEffects": "The taskbar weather/news button and its right-click menu disappear. Sign out or restart Explorer for it to take effect.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-feeds",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Feeds",
+          "name": "EnableFeeds",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-windows-error-reporting",
+      "title": "Turn Off Windows Error Reporting",
+      "description": "Disables Windows Error Reporting and its queued-report upload task, so crashes and hangs no longer trigger WerFault data collection or uploads to Microsoft.",
+      "category": "privacy",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Only matters when something crashes: a crashed game closes without the WerFault collection step. No change during normal play.",
+      "recommended": false,
+      "recommendReason": "Leave this on unless you're sure. When a game or the GTX 1070 driver crashes, Windows Error Reporting is how Microsoft and NVIDIA see the problem, and its reports help you troubleshoot.",
+      "sideEffects": "No crash reports reach Microsoft or app and driver vendors, 'check for solutions' stops working, and Reliability Monitor shows fewer problem reports.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/wer/wer-settings",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting",
+          "name": "Disabled",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Windows Error Reporting\\QueueReporting",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "disable-edge-background",
+      "title": "Stop Microsoft Edge Running in Background",
+      "description": "Turns off Edge startup boost and background mode by policy, so Edge doesn't preload processes at sign-in or keep running after you close its last window.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Frees the memory and sign-in CPU time that preloaded Edge processes use. Only matters if the Edge browser is installed.",
+      "recommended": false,
+      "recommendReason": "The Edge browser isn't installed on your PC (there's only a leftover Edge folder, the WebView2 runtime and the EdgeCore runtime the Copilot app uses), so there's nothing to stop. Turn it on if you reinstall Edge.",
+      "sideEffects": "Edge shows 'Your browser is managed by your organization', and its first launch after sign-in is slightly slower.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies/startupboostenabled",
+        "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies/backgroundmodeenabled"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Edge",
+          "name": "StartupBoostEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Edge",
+          "name": "BackgroundModeEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-remote-assistance",
+      "title": "Turn Off Remote Assistance",
+      "description": "Blocks Windows Remote Assistance by policy, so nobody can be invited to view or control this PC through Remote Assistance invitations.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Reduces remote-access attack surface; no performance effect.",
+      "recommended": true,
+      "recommendReason": "Remote Assistance connections are allowed on your PC (the Windows default), and a home gaming PC rarely needs them.",
+      "sideEffects": "You can't send or accept Windows Remote Assistance (msra.exe) invitations, and the option in System Properties is greyed out.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-remoteassistance#solicitedremoteassistance"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+          "name": "fAllowToGetHelp",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-language-list-sharing",
+      "title": "Stop Sharing Language List With Websites",
+      "description": "Turns off 'Let websites provide locally relevant content by accessing my language list' for your account, so Windows doesn't expose your installed language list to websites.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only; no performance effect.",
+      "recommended": true,
+      "recommendReason": "This is already off for your account, so applying it changes nothing. It's listed so Redline can detect and show the setting.",
+      "sideEffects": "Some websites may not auto-select your preferred language.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\International\\User Profile",
+          "name": "HttpAcceptLanguageOptOut",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "maps-broker-manual",
+      "title": "Stop Offline Maps Background Service",
+      "description": "Sets the Downloaded Maps Manager service to Manual and disables the offline-map update and notification tasks, so they no longer start with Windows.",
+      "category": "services",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Tiny saving. The service is already Manual on your PC, so the only change here is stopping the daily map-update task and map notifications. No FPS change.",
+      "recommended": true,
+      "recommendReason": "Your PC has no use for offline maps, and Microsoft deprecated the Maps app in 2025. The service is already Manual here (Windows default is Automatic, delayed start), but the map update task still runs daily.",
+      "sideEffects": "Offline maps downloaded in the Maps app won't update automatically. The service still starts on demand if an app needs it.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/security/windows-services/security-guidelines-for-disabling-system-services-in-windows-server",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features"
+      ],
+      "actions": [
+        {
+          "type": "service",
+          "name": "MapsBroker",
+          "startType": "Manual",
+          "default": "AutomaticDelayed"
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Maps\\MapsUpdateTask",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Maps\\MapsToastTask",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "disable-inking-typing-personalization",
+      "title": "Turn Off Inking and Typing Personalization",
+      "description": "Stops Windows from collecting what you type and write to build a personal dictionary for handwriting and text suggestions.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "A desktop gaming PC with no pen gains nothing from typing and ink collection. Both values are already 1 on this PC, so applying it should report no change.",
+      "sideEffects": "Handwriting and typing suggestions stop learning new words from you.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\InputPersonalization",
+          "name": "RestrictImplicitTextCollection",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": 0
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\InputPersonalization",
+          "name": "RestrictImplicitInkCollection",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "disable-online-speech-recognition",
+      "title": "Turn Off Online Speech Recognition",
+      "description": "Keeps dictation and voice input from sending your speech to Microsoft's cloud speech service.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "Matches Settings > Privacy > Speech > Online speech recognition: Off. HasAccepted is already 0 on this PC, so this mainly keeps it that way.",
+      "sideEffects": "Cloud dictation (Win+H) stops working. Offline speech features are unaffected.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
+          "name": "HasAccepted",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-app-diagnostic-access",
+      "title": "Block Apps From Reading Diagnostic Info",
+      "description": "Store apps can no longer read diagnostic information about other running apps, such as which apps are open.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "Uses the documented App Privacy policy (Force Deny). Nothing on a typical gaming setup needs Store apps to see other apps.",
+      "sideEffects": "Store apps that list or manage other apps can no longer see them. Desktop programs are not affected.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy",
+          "name": "LetAppsGetDiagnosticInfo",
+          "valueType": "REG_DWORD",
+          "value": 2,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-voice-activation",
+      "title": "Turn Off Voice Activation for Apps",
+      "description": "Stops apps from listening for a wake word, both while you are signed in and on the lock screen.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "Cortana is not used on this PC, so no app needs to listen for a wake word.",
+      "sideEffects": "Voice assistants can't be started by saying their wake word. Starting them by click or keyboard still works.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy",
+          "name": "LetAppsActivateWithVoice",
+          "valueType": "REG_DWORD",
+          "value": 2,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy",
+          "name": "LetAppsActivateWithVoiceAboveLock",
+          "valueType": "REG_DWORD",
+          "value": 2,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-settings-sync",
+      "title": "Turn Off Settings Sync",
+      "description": "Stops Windows from syncing your theme, language and other settings to your Microsoft account.",
+      "category": "privacy",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Removes a small amount of background sync traffic. No measurable effect on FPS.",
+      "recommended": false,
+      "recommendReason": "Only useful if you don't want settings shared across PCs. Not pre-selected because some people rely on sync.",
+      "sideEffects": "Theme, language preferences and other synced settings no longer roam to your other Windows PCs. Users can't turn sync back on in Settings while this policy is set.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\SettingSync",
+          "name": "DisableSettingSync",
+          "valueType": "REG_DWORD",
+          "value": 2,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\SettingSync",
+          "name": "DisableSettingSyncUserOverride",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-offline-maps-network",
+      "title": "Stop Offline Maps Background Downloads",
+      "description": "Turns off automatic downloading and updating of offline map data, and the unrequested network traffic from the Offline Maps settings page.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Removes occasional background downloads. No measurable effect on FPS.",
+      "recommended": true,
+      "recommendReason": "Pairs with the Maps service tweak. A gaming PC rarely needs offline maps.",
+      "sideEffects": "Downloaded offline maps stop updating automatically. You can still update them by hand in Settings.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Maps",
+          "name": "AutoDownloadAndUpdateMapData",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Maps",
+          "name": "AllowUntriggeredNetworkTrafficOnSettingsPage",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-app-launch-tracking",
+      "title": "Stop Tracking App Launches",
+      "description": "Windows stops recording which apps you open to personalise Start and search results.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": true,
+      "recommendReason": "Matches Settings > Privacy > General > Let Windows track app launches: Off. It is currently on (Start_TrackProgs = 1).",
+      "sideEffects": "The Most used list in Start stops updating, and the Run dialog (Win+R) stops remembering commands you type.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "Start_TrackProgs",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "id": "disable-device-metadata-download",
+      "title": "Stop Device Info Downloads",
+      "description": "Windows stops fetching device icons and descriptions from the internet for hardware you plug in.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": false,
+      "recommendReason": "Harmless, but the benefit is small, so it is not pre-selected.",
+      "sideEffects": "Devices and Printers may show generic icons and fewer details for new hardware. Driver installation is not affected.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata",
+          "name": "PreventDeviceMetadataFromNetwork",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-font-providers",
+      "title": "Stop Online Font Downloads",
+      "description": "Windows stops downloading fonts on demand from Microsoft's font service. Fonts already installed keep working.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy setting. No measurable effect on FPS or latency.",
+      "recommended": false,
+      "recommendReason": "Small privacy gain. Not pre-selected because text in less common scripts may fall back to a different font.",
+      "sideEffects": "Apps that ask Windows for a font you don't have installed get a fallback font instead of a download.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "EnableFontProviders",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "windows-ink-workspace-off",
+      "title": "Turn Off Windows Ink Workspace",
+      "description": "Removes the pen workspace and its suggested-app tiles. A desktop with no pen never uses it.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Removes an unused feature. No measurable effect on FPS.",
+      "recommended": false,
+      "recommendReason": "This PC has no pen or touch screen, so nothing is lost. Not pre-selected because the gain is cosmetic.",
+      "sideEffects": "The Windows Ink Workspace button and Sketchpad shortcuts disappear.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-windowsinkworkspace"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\WindowsInkWorkspace",
+          "name": "AllowWindowsInkWorkspace",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\WindowsInkWorkspace",
+          "name": "AllowSuggestedAppsInWindowsInkWorkspace",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "logon-background-clear",
+      "title": "Clear Sign-In Background",
+      "description": "Shows the sign-in screen background without the frosted blur effect.",
+      "category": "visual",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Purely cosmetic. The blur only runs on the sign-in screen, never in games.",
+      "recommended": false,
+      "recommendReason": "Matter of taste. Included because it is a documented policy, not because it speeds anything up.",
+      "sideEffects": "The sign-in screen looks sharper but less stylised.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-logon"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "DisableAcrylicBackgroundOnLogon",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "reserved-storage-off",
+      "title": "Turn Off Reserved Storage",
+      "description": "Frees the space (about 7 GB) Windows keeps aside so updates always have room to install.",
+      "category": "storage",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Frees disk space only. No effect on FPS.",
+      "recommended": false,
+      "recommendReason": "The 1 TB MX500 has plenty of room, so the reserve is rarely needed, but it is not pre-selected because it protects updates on a full drive.",
+      "sideEffects": "If the drive fills up, Windows updates can fail to install. The change is refused while an update is in progress; try again after it finishes.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/powershell/module/dism/set-windowsreservedstoragestate",
+        "https://learn.microsoft.com/en-us/powershell/module/dism/get-windowsreservedstoragestate"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "Set-WindowsReservedStorageState -State Disabled",
+          "revert": "Set-WindowsReservedStorageState -State Enabled",
+          "detect": "(Get-WindowsReservedStorageState).ReservedStorageState -eq 'Disabled'"
+        }
+      ]
+    }
+  ],
+  "appx": [
+    {
+      "package": "Microsoft.BingWeather",
+      "title": "Weather",
+      "recommended": true,
+      "note": "MSN Weather app. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.GetHelp",
+      "title": "Get Help",
+      "recommended": true,
+      "note": "Microsoft support chat app. Some help links open it, so reinstall it from the Store if you need support."
+    },
+    {
+      "package": "Microsoft.MicrosoftOfficeHub",
+      "title": "Microsoft 365 Copilot (Office Hub)",
+      "recommended": true,
+      "note": "Microsoft 365 hub and launcher app (now named Microsoft 365 Copilot). Removing it doesn't uninstall Office. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.MicrosoftSolitaireCollection",
+      "title": "Solitaire Collection",
+      "recommended": true,
+      "note": "Ad-supported card games. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.MixedReality.Portal",
+      "title": "Mixed Reality Portal",
+      "recommended": true,
+      "note": "Only needed for Windows Mixed Reality headsets, which Microsoft deprecated in December 2023. Keep it if you use a WMR headset; reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "microsoft.windowscommunicationsapps",
+      "title": "Mail and Calendar",
+      "recommended": true,
+      "note": "Support ended December 31, 2024, and Microsoft says it can no longer send or receive mail (the new Outlook replaces it). Export any local mail or events you need before removing it. Still reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.WindowsFeedbackHub",
+      "title": "Feedback Hub",
+      "recommended": true,
+      "note": "Only needed to send feedback to Microsoft. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.YourPhone",
+      "title": "Phone Link",
+      "recommended": false,
+      "note": "Links an Android phone or iPhone to the PC and can run in the background once set up. Keep it if you use phone notifications, messages or calls on the PC."
+    },
+    {
+      "package": "Microsoft.ZuneMusic",
+      "title": "Media Player (Groove Music)",
+      "recommended": false,
+      "note": "The default music player. Removing it changes which app opens audio files. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.ZuneVideo",
+      "title": "Movies & TV",
+      "recommended": false,
+      "note": "The default video player on Windows 10. Removing it changes which app opens video files. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.WindowsSoundRecorder",
+      "title": "Voice Recorder",
+      "recommended": false,
+      "note": "Small utility that only runs when opened; harmless to keep."
+    },
+    {
+      "package": "Microsoft.Copilot",
+      "title": "Microsoft Copilot",
+      "recommended": false,
+      "note": "Microsoft's AI assistant app (runs on the EdgeCore runtime on this PC). Remove it if you don't use it; reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.XboxGamingOverlay",
+      "title": "Xbox Game Bar",
+      "recommended": false,
+      "note": "The Win+G overlay for game capture, performance widgets and Xbox social features. To stop it popping up, turn Game Bar off in Settings instead of removing it."
+    },
+    {
+      "package": "Microsoft.XboxSpeechToTextOverlay",
+      "title": "Xbox Speech-to-Text Overlay",
+      "recommended": false,
+      "note": "Game chat transcription for accessibility; it only runs when used. Keep it if you use Xbox party chat in Game Pass games."
+    }
+  ],
+  "neverRemove": [
+    {
+      "package": "Microsoft.WindowsStore",
+      "title": "Microsoft Store",
+      "reason": "Installs, updates and reinstalls Store apps, including NVIDIA Control Panel and Game Pass components. Removed apps can't come back without it."
+    },
+    {
+      "package": "Microsoft.StorePurchaseApp",
+      "title": "Store Purchase App",
+      "reason": "Handles Store purchases and app licensing."
+    },
+    {
+      "package": "Microsoft.DesktopAppInstaller",
+      "title": "App Installer (winget)",
+      "reason": "Provides winget and .appx/.msix installation; many tools and installers depend on it."
+    },
+    {
+      "package": "Microsoft.Winget.Source",
+      "title": "winget Package Source",
+      "reason": "The package catalog winget uses."
+    },
+    {
+      "package": "Microsoft.VCLibs.*",
+      "title": "Visual C++ Runtime for Store Apps",
+      "reason": "Shared runtime framework; Store apps and games that depend on it stop launching without it."
+    },
+    {
+      "package": "Microsoft.NET.Native.*",
+      "title": ".NET Native Framework and Runtime",
+      "reason": "Shared framework packages that many Store apps need to run."
+    },
+    {
+      "package": "Microsoft.UI.Xaml.*",
+      "title": "WinUI (UI.Xaml) Framework",
+      "reason": "UI framework that the Store, Xbox apps and many others are built on."
+    },
+    {
+      "package": "Microsoft.WindowsAppRuntime.*",
+      "title": "Windows App SDK Runtime",
+      "reason": "Runtime framework for modern desktop apps."
+    },
+    {
+      "package": "Microsoft.Services.Store.Engagement",
+      "title": "Store Engagement Framework",
+      "reason": "Framework package that Store apps reference; removing it can break them."
+    },
+    {
+      "package": "Microsoft.XboxIdentityProvider",
+      "title": "Xbox Identity Provider",
+      "reason": "Signs PC games into the Xbox network. Removing it breaks sign-in for Game Pass and Xbox-enabled games."
+    },
+    {
+      "package": "Microsoft.Xbox.TCUI",
+      "title": "Xbox TCUI",
+      "reason": "In-game Xbox UI (profiles, invites, friends) that games call directly."
+    },
+    {
+      "package": "Microsoft.XboxGameCallableUI",
+      "title": "Xbox Game Callable UI",
+      "reason": "System component that games use to show Xbox dialogs."
+    },
+    {
+      "package": "Microsoft.GamingServices",
+      "title": "Gaming Services",
+      "reason": "Required to install and run PC Game Pass and Xbox app games (it isn't installed on this PC yet, but keep it if it appears)."
+    },
+    {
+      "package": "Microsoft.Windows.SecHealthUI",
+      "title": "Windows Security",
+      "reason": "The Windows Security app for Microsoft Defender, firewall and device security status."
+    },
+    {
+      "package": "Microsoft.Windows.Apprep.ChxApp",
+      "title": "SmartScreen",
+      "reason": "Microsoft Defender SmartScreen reputation checks for downloaded apps."
+    },
+    {
+      "package": "Microsoft.Windows.ShellExperienceHost",
+      "title": "Shell Experience Host",
+      "reason": "Taskbar flyouts, Action Center and other core shell UI."
+    },
+    {
+      "package": "Microsoft.Windows.StartMenuExperienceHost",
+      "title": "Start Menu",
+      "reason": "The Start menu itself."
+    },
+    {
+      "package": "Microsoft.Windows.Search",
+      "title": "Windows Search UI",
+      "reason": "The taskbar and Start search experience."
+    },
+    {
+      "package": "Microsoft.Windows.CloudExperienceHost",
+      "title": "Cloud Experience Host",
+      "reason": "Microsoft account sign-in, setup and Windows Hello flows."
+    },
+    {
+      "package": "Microsoft.AAD.BrokerPlugin",
+      "title": "Account Token Broker",
+      "reason": "Handles Microsoft and work account sign-in tokens for the Store, Office and Xbox."
+    },
+    {
+      "package": "Microsoft.AccountsControl",
+      "title": "Accounts Control",
+      "reason": "System account management UI."
+    },
+    {
+      "package": "Microsoft.LockApp",
+      "title": "Lock Screen",
+      "reason": "The lock screen."
+    },
+    {
+      "package": "windows.immersivecontrolpanel",
+      "title": "Settings",
+      "reason": "The Settings app."
+    },
+    {
+      "package": "Microsoft.Windows.ContentDeliveryManager",
+      "title": "Content Delivery Manager",
+      "reason": "System component behind the lock screen and Start content. Turn off its suggestions with the Tips and Suggestions tweak instead of removing it."
+    },
+    {
+      "package": "MicrosoftWindows.Client.CBS",
+      "title": "Windows Client Shell Components",
+      "reason": "Shell features delivered through Windows servicing."
+    },
+    {
+      "package": "Microsoft.Win32WebViewHost",
+      "title": "Desktop App Web Viewer",
+      "reason": "Hosts web content for desktop apps."
+    },
+    {
+      "package": "Microsoft.HEIFImageExtension",
+      "title": "HEIF Image Extensions",
+      "reason": "Codec used by Photos and other apps to open HEIF/HEIC images."
+    },
+    {
+      "package": "Microsoft.VP9VideoExtensions",
+      "title": "VP9 Video Extensions",
+      "reason": "Video codec used by apps and media playback."
+    },
+    {
+      "package": "Microsoft.WebMediaExtensions",
+      "title": "Web Media Extensions",
+      "reason": "OGG, Vorbis and Theora codec support for apps."
+    },
+    {
+      "package": "Microsoft.WebpImageExtension",
+      "title": "WebP Image Extensions",
+      "reason": "Codec used to open WebP images."
+    },
+    {
+      "package": "NVIDIACorp.NVIDIAControlPanel",
+      "title": "NVIDIA Control Panel",
+      "reason": "The control panel for your GTX 1070's DCH driver ships as a Store app; removing it removes your GPU settings UI."
+    },
+    {
+      "package": "RealtekSemiconductorCorp.RealtekAudioControl",
+      "title": "Realtek Audio Console",
+      "reason": "Settings app for the motherboard's Realtek audio (jack detection and enhancements)."
+    }
+  ],
+  "excluded": [
+    {
+      "name": "Disable Microsoft Defender Antivirus",
+      "reason": "Leaves the PC without malware protection (Defender is the only antivirus here). Tamper Protection is designed to block these changes anyway."
+    },
+    {
+      "name": "Add Defender exclusions for game folders or whole drives",
+      "reason": "Creates blind spots that malware can hide in. Redline never adds security exclusions."
+    },
+    {
+      "name": "Disable Windows Update (services, policies or blocking update servers)",
+      "reason": "Stops security fixes. Windows 10 22H2 is past its October 14, 2025 end of support, so Extended Security Updates are the only patches it can still get."
+    },
+    {
+      "name": "Turn off UAC (EnableLUA = 0)",
+      "reason": "Every program runs with full administrator rights, and Store/UWP apps refuse to start."
+    },
+    {
+      "name": "Disable Windows Defender Firewall",
+      "reason": "Exposes listening network services to every device on the network."
+    },
+    {
+      "name": "Disable Microsoft Defender SmartScreen",
+      "reason": "Removes reputation checks on downloaded apps and files, a main defense against fake cheats, cracks and mods that carry malware."
+    },
+    {
+      "name": "Disable Spectre/Meltdown CPU mitigations (FeatureSettingsOverride, InSpectre)",
+      "reason": "Reopens known CPU side-channel vulnerabilities, which affect Kaby Lake chips like the i7-7700."
+    },
+    {
+      "name": "Disable Memory Integrity (HVCI), virtualization-based security or Credential Guard",
+      "reason": "Weakens kernel protection against malicious and vulnerable drivers. Redline doesn't change VBS settings."
+    },
+    {
+      "name": "Disable driver signature enforcement or enable test signing",
+      "reason": "Lets unsigned kernel drivers load, which is how rootkits and many cheats get in."
+    },
+    {
+      "name": "Turn off DEP, ASLR or Control Flow Guard system-wide",
+      "reason": "Removes core memory-exploit mitigations for every program on the PC."
+    },
+    {
+      "name": "Disable Windows Security Center or its notifications",
+      "reason": "Hides warnings when protection is off or out of date."
+    },
+    {
+      "name": "Block Microsoft telemetry with hosts-file or firewall blocklists",
+      "reason": "Popular lists also block Windows Update, Defender definitions, activation and Store endpoints, and Redline can't revert them cleanly. The diagnostic data tweaks reach the same goal safely."
+    },
+    {
+      "name": "Remove Microsoft Edge or the WebView2 Runtime",
+      "reason": "Many desktop apps depend on WebView2, the Copilot app runs on the Edge runtime, and News and Interests stops working without Edge. Forced removal is unsupported and can break them."
+    },
+    {
+      "name": "Remove the Microsoft Store, App Installer, Xbox Identity Provider or framework packages",
+      "reason": "Breaks app updates, Store reinstalls (including NVIDIA Control Panel) and Xbox/Game Pass sign-in."
+    },
+    {
+      "name": "Delete or take ownership of protected system files (for example CompatTelRunner.exe)",
+      "reason": "Breaks Windows servicing: updates fail or restore the files, and SFC/DISM report corruption."
+    },
+    {
+      "name": "Disable System Restore or Volume Shadow Copy",
+      "reason": "Removes the restore points that let you roll back a bad driver or update."
+    },
+    {
+      "name": "Disable the page file",
+      "reason": "Even with 32 GB of RAM, some games and drivers expect a page file. Without one, out-of-memory crashes can happen and crash dumps can't be written."
+    },
+    {
+      "name": "CPU undervolting or power-limit unlocking (ThrottleStop, Intel XTU)",
+      "reason": "Needs a third-party kernel driver and can cause instability. Redline never changes CPU voltage, clocks or power limits."
+    },
+    {
+      "name": "Disable the telemetry service (DiagTrack)",
+      "reason": "Saves almost nothing, and third-party ESU troubleshooting guides list a disabled DiagTrack as a cause of the missing Extended Security Updates enrollment option, the only source of security patches left for Windows 10 22H2. The diagnostic data policy limits collection to Required instead. DiagTrack is already Disabled on this PC; set it back to Automatic if Windows Update doesn't offer ESU enrollment."
+    },
+    {
+      "name": "Block sponsored app auto-installs (SilentInstalledAppsEnabled)",
+      "reason": "Microsoft doesn't document this per-user value, and its documented switch ('Turn off Microsoft consumer experiences') isn't supported on Windows 10 Pro."
+    },
+    {
+      "name": "Remove Store apps the Microsoft Store no longer offers (Tips, 3D Viewer, Paint 3D, OneNote for Windows 10, People, Skype, Microsoft Pay, Maps, Cortana, Xbox Console Companion, Xbox Game Bar Plugin)",
+      "reason": "Their Store listings no longer let you get them (Microsoft removed 3D Viewer, Paint 3D and Maps from the Store), so uninstalling them couldn't be undone."
+    }
+  ]
+}

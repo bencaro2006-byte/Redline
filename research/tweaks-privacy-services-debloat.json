@@ -1,0 +1,995 @@
+{
+  "category": "privacy-services-debloat",
+  "tweaks": [
+    {
+      "id": "diagnostic-data-required",
+      "title": "Limit Diagnostic Data to Required",
+      "description": "Sets the Allow Diagnostic Data policy to Required, so Windows never sends Optional diagnostic data (detailed app usage, browsing and enhanced error reports). This is a privacy setting; it does not change game performance.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only, no measurable FPS or latency change. Pro can't go lower: Microsoft treats the 'off' level (0) as Required on Pro, so 1 is the real minimum.",
+      "recommended": true,
+      "recommendReason": "Diagnostic data on your PC is already at the lowest level Windows 10 Pro allows, so nothing changes today. The policy locks it there so a setup prompt or settings reset can't turn Optional data back on.",
+      "sideEffects": "Settings shows 'Some settings are managed by your organization'. The Windows Insider Program needs Optional data, so it stops offering preview builds.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#allowtelemetry",
+        "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+          "name": "AllowTelemetry",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-ceip",
+      "title": "Turn Off Customer Experience Program",
+      "description": "Opts the PC out of the legacy Windows Customer Experience Improvement Program by policy and disables its three data-collection tasks (Consolidator, USB CEIP and the Autochk proxy).",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Negligible. These are short, low-priority jobs (Consolidator runs every few hours); removing them won't change FPS.",
+      "recommended": true,
+      "recommendReason": "All three tasks exist and are enabled on your Windows 10 22H2 install, and CEIP has been superseded by the diagnostic data settings, so nothing useful is lost.",
+      "sideEffects": "None noticeable.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-icm#ceipenable",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
+          "name": "CEIPEnable",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Autochk\\Proxy",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "disable-compatibility-appraiser",
+      "title": "Disable Compatibility Appraiser Tasks",
+      "description": "Disables the Microsoft Compatibility Appraiser and ProgramDataUpdater tasks, which run CompatTelRunner.exe to inventory apps and drivers for upgrade compatibility and diagnostic data. That scan can briefly load the CPU and disk.",
+      "category": "privacy",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Removes an occasional CompatTelRunner scan at low priority. You'll only notice a difference if it used to kick in while you were playing.",
+      "recommended": true,
+      "recommendReason": "Your i7-7700 isn't on Microsoft's Windows 11 supported CPU list, so upgrade appraisal has nothing to offer this PC. The task still runs daily, and because it catches up right after boot when the PC was off at 3 AM, it can land at the start of a gaming session.",
+      "sideEffects": "Windows can no longer assess this PC for OS upgrades, and Microsoft doesn't document everything that uses appraiser data. Turn it back on before an in-place upgrade or if Windows Update reports a compatibility problem. A cumulative update may re-enable the task.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/minimum/supported/windows-11-supported-intel-processors"
+      ],
+      "actions": [
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Application Experience\\Microsoft Compatibility Appraiser",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Application Experience\\ProgramDataUpdater",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "disable-feedback-prompts",
+      "title": "Stop Windows Feedback Requests",
+      "description": "Turns off Windows feedback notifications by policy, sets feedback frequency to Never and disables the two tasks that download feedback survey content, so survey pop-ups don't appear mid-session.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Removes occasional survey notifications; no performance effect.",
+      "recommended": true,
+      "recommendReason": "Your account's survey count is already set to 0, but the policy isn't set and both survey-download tasks are still enabled on your PC.",
+      "sideEffects": "Feedback Hub still works if you open it yourself.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#donotshowfeedbacknotifications",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+          "name": "DoNotShowFeedbackNotifications",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Siuf\\Rules",
+          "name": "PeriodInNanoSeconds",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Siuf\\Rules",
+          "name": "NumberOfSIUFInPeriod",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClient",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClientOnScenarioDownload",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "disable-advertising-id",
+      "title": "Turn Off Advertising ID",
+      "description": "Disables the advertising ID by policy, so apps can't use it to link your activity across apps for personalized ads.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only; no performance effect.",
+      "recommended": true,
+      "recommendReason": "The advertising ID is already off for your account. The policy (supported on Windows 10 Pro) keeps it off for every account on this PC and stops a setup prompt from turning it back on.",
+      "sideEffects": "Ads in apps become less personalized, not fewer. The Settings toggle is greyed out.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#disableadvertisingid",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\AdvertisingInfo",
+          "name": "DisabledByGroupPolicy",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-tailored-experiences",
+      "title": "Turn Off Tailored Experiences",
+      "description": "Stops Microsoft from using your diagnostic data to personalize tips, ads and recommendations in Windows.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only; no performance effect.",
+      "recommended": true,
+      "recommendReason": "Tailored experiences are already off for your account. The policy (supported on Windows 10 Pro) keeps it off even if an update or setup prompt tries to turn it back on.",
+      "sideEffects": "The Tailored experiences toggle in Settings shows as managed by your organization.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#allowtailoredexperienceswithdiagnosticdata",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Policies\\Microsoft\\Windows\\CloudContent",
+          "name": "DisableTailoredExperiencesWithDiagnosticData",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-activity-history",
+      "title": "Turn Off Activity History",
+      "description": "Stops Windows from recording the apps and files you use for Timeline, and from publishing or uploading that activity history.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only. Microsoft already stopped syncing activity history to the cloud (2021 for Microsoft accounts), so this mainly stops local Timeline logging.",
+      "recommended": true,
+      "recommendReason": "These three policies are already set on your PC, so applying this changes nothing. It's listed so Redline can detect and show the setting.",
+      "sideEffects": "Timeline (Win+Tab) no longer shows past activities.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#enableactivityfeed",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
+        "https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "EnableActivityFeed",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "PublishUserActivities",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "UploadUserActivities",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-cortana",
+      "title": "Turn Off Cortana and Search Location",
+      "description": "Disables Cortana and stops Windows Search from using your location, by policy. The standalone Cortana app is retired on Windows 10, so this mainly removes leftover integration.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Little to no effect: Microsoft deprecated the standalone Cortana app in June 2023 and it no longer works. The location policy is a small privacy gain.",
+      "recommended": false,
+      "recommendReason": "Nothing to gain on your PC: the retired Cortana app no longer works, its taskbar button is already hidden, and location access is already off (the Location service is disabled). Turn it on only if you want both locked off by policy.",
+      "sideEffects": "Cortana can't be launched. Windows Search keeps working for local apps, settings and files.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#allowcortana",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search#allowsearchtouselocation",
+        "https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
+          "name": "AllowCortana",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
+          "name": "AllowSearchToUseLocation",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-search-highlights",
+      "title": "Turn Off Search Highlights and Suggestions",
+      "description": "Turns off search highlights (trending searches and daily content) in Windows search and stops File Explorer from saving and suggesting your past searches, both by policy.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No effect on games. Many users report the Explorer policy also removes Bing web results from taskbar search on Windows 10 2004 and later, but Microsoft doesn't document that, so don't count on it.",
+      "recommended": true,
+      "recommendReason": "Search highlights are already off for your account; the policy keeps them off. The part that changes something here is the File Explorer policy, which stops it saving your past searches. Microsoft's 'Don't search the web' policy isn't supported on Windows 10 Pro.",
+      "sideEffects": "File Explorer's search box stops suggesting your recent searches. Sign out and back in for it to take effect.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-windowsexplorer#disablesearchboxsuggestions",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search#allowsearchhighlights",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search#donotusewebresults"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+          "name": "DisableSearchBoxSuggestions",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
+          "name": "EnableDynamicContentInWSB",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-tips-suggestions",
+      "title": "Turn Off Tips, Suggestions and Setup Nags",
+      "description": "Turns off Start menu app suggestions, 'tips and tricks' notifications, suggested content in Settings, 'finish setting up your device' prompts and third-party Spotlight suggestions for your account.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Removes ads and nag pop-ups; no performance effect.",
+      "recommended": true,
+      "recommendReason": "These suggestions are all still on for your account, and the machine-wide policy for them ('Turn off Microsoft consumer experiences', already set on your PC) is ignored on Windows 10 Pro.",
+      "sideEffects": "You also stop getting Microsoft's tips about Windows features.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#allowwindowsconsumerfeatures",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#allowthirdpartysuggestionsinwindowsspotlight"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-338388Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SystemPaneSuggestionsEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-338389Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-338393Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-353694Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-353696Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\UserProfileEngagement",
+          "name": "ScoobeSystemSettingEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Policies\\Microsoft\\Windows\\CloudContent",
+          "name": "DisableThirdPartySuggestions",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "hide-people-bar",
+      "title": "Remove People From the Taskbar",
+      "description": "Removes the My People button and its settings toggle from the taskbar by policy. My People is a deprecated feature that Microsoft stopped developing in version 1909.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Cosmetic: removes the People button (if it's showing) and its taskbar setting. No performance effect.",
+      "recommended": true,
+      "recommendReason": "My People is deprecated (no longer developed since version 1909) but still ships in Windows 10 22H2, and its PeopleExperienceHost component is installed on your PC. It does nothing for gaming.",
+      "sideEffects": "You can't pin contacts to the taskbar. Sign out and back in for it to take effect.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-start#hidepeoplebar",
+        "https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+          "name": "HidePeopleBar",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-news-and-interests",
+      "title": "Turn Off News and Interests",
+      "description": "Removes the weather and news button from the taskbar by policy, along with the web feed it loads in the background.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change. Saves the feed's background memory and network use only while the feed is active.",
+      "recommended": false,
+      "recommendReason": "Windows already reports the feed as disabled on your PC because the Edge browser isn't installed, so this changes nothing today. Turn it on if Edge comes back and you don't want the feed.",
+      "sideEffects": "The taskbar weather/news button and its right-click menu disappear. Sign out or restart Explorer for it to take effect.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-feeds",
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Feeds",
+          "name": "EnableFeeds",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-windows-error-reporting",
+      "title": "Turn Off Windows Error Reporting",
+      "description": "Disables Windows Error Reporting and its queued-report upload task, so crashes and hangs no longer trigger WerFault data collection or uploads to Microsoft.",
+      "category": "privacy",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Only matters when something crashes: a crashed game closes without the WerFault collection step. No change during normal play.",
+      "recommended": false,
+      "recommendReason": "Leave this on unless you're sure. When a game or the GTX 1070 driver crashes, Windows Error Reporting is how Microsoft and NVIDIA see the problem, and its reports help you troubleshoot.",
+      "sideEffects": "No crash reports reach Microsoft or app and driver vendors, 'check for solutions' stops working, and Reliability Monitor shows fewer problem reports.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/wer/wer-settings",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting",
+          "name": "Disabled",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Windows Error Reporting\\QueueReporting",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "disable-edge-background",
+      "title": "Stop Microsoft Edge Running in Background",
+      "description": "Turns off Edge startup boost and background mode by policy, so Edge doesn't preload processes at sign-in or keep running after you close its last window.",
+      "category": "debloat",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Frees the memory and sign-in CPU time that preloaded Edge processes use. Only matters if the Edge browser is installed.",
+      "recommended": false,
+      "recommendReason": "The Edge browser isn't installed on your PC (there's only a leftover Edge folder, the WebView2 runtime and the EdgeCore runtime the Copilot app uses), so there's nothing to stop. Turn it on if you reinstall Edge.",
+      "sideEffects": "Edge shows 'Your browser is managed by your organization', and its first launch after sign-in is slightly slower.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies/startupboostenabled",
+        "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies/backgroundmodeenabled"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Edge",
+          "name": "StartupBoostEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Edge",
+          "name": "BackgroundModeEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-remote-assistance",
+      "title": "Turn Off Remote Assistance",
+      "description": "Blocks Windows Remote Assistance by policy, so nobody can be invited to view or control this PC through Remote Assistance invitations.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Reduces remote-access attack surface; no performance effect.",
+      "recommended": true,
+      "recommendReason": "Remote Assistance connections are allowed on your PC (the Windows default), and a home gaming PC rarely needs them.",
+      "sideEffects": "You can't send or accept Windows Remote Assistance (msra.exe) invitations, and the option in System Properties is greyed out.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-remoteassistance#solicitedremoteassistance"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+          "name": "fAllowToGetHelp",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-language-list-sharing",
+      "title": "Stop Sharing Language List With Websites",
+      "description": "Turns off 'Let websites provide locally relevant content by accessing my language list' for your account, so Windows doesn't expose your installed language list to websites.",
+      "category": "privacy",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Privacy only; no performance effect.",
+      "recommended": true,
+      "recommendReason": "This is already off for your account, so applying it changes nothing. It's listed so Redline can detect and show the setting.",
+      "sideEffects": "Some websites may not auto-select your preferred language.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\International\\User Profile",
+          "name": "HttpAcceptLanguageOptOut",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "maps-broker-manual",
+      "title": "Stop Offline Maps Background Service",
+      "description": "Sets the Downloaded Maps Manager service to Manual and disables the offline-map update and notification tasks, so they no longer start with Windows.",
+      "category": "services",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Tiny saving. The service is already Manual on your PC, so the only change here is stopping the daily map-update task and map notifications. No FPS change.",
+      "recommended": true,
+      "recommendReason": "Your PC has no use for offline maps, and Microsoft deprecated the Maps app in 2025. The service is already Manual here (Windows default is Automatic, delayed start), but the map update task still runs daily.",
+      "sideEffects": "Offline maps downloaded in the Maps app won't update automatically. The service still starts on demand if an app needs it.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/security/windows-services/security-guidelines-for-disabling-system-services-in-windows-server",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features"
+      ],
+      "actions": [
+        {
+          "type": "service",
+          "name": "MapsBroker",
+          "startType": "Manual",
+          "default": "AutomaticDelayed"
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Maps\\MapsUpdateTask",
+          "enabled": false,
+          "defaultEnabled": true
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Maps\\MapsToastTask",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    }
+  ],
+  "appx": [
+    {
+      "package": "Microsoft.BingWeather",
+      "title": "Weather",
+      "recommended": true,
+      "note": "MSN Weather app. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.GetHelp",
+      "title": "Get Help",
+      "recommended": true,
+      "note": "Microsoft support chat app. Some help links open it, so reinstall it from the Store if you need support."
+    },
+    {
+      "package": "Microsoft.MicrosoftOfficeHub",
+      "title": "Microsoft 365 Copilot (Office Hub)",
+      "recommended": true,
+      "note": "Microsoft 365 hub and launcher app (now named Microsoft 365 Copilot). Removing it doesn't uninstall Office. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.MicrosoftSolitaireCollection",
+      "title": "Solitaire Collection",
+      "recommended": true,
+      "note": "Ad-supported card games. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.MixedReality.Portal",
+      "title": "Mixed Reality Portal",
+      "recommended": true,
+      "note": "Only needed for Windows Mixed Reality headsets, which Microsoft deprecated in December 2023. Keep it if you use a WMR headset; reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "microsoft.windowscommunicationsapps",
+      "title": "Mail and Calendar",
+      "recommended": true,
+      "note": "Support ended December 31, 2024, and Microsoft says it can no longer send or receive mail (the new Outlook replaces it). Export any local mail or events you need before removing it. Still reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.WindowsFeedbackHub",
+      "title": "Feedback Hub",
+      "recommended": true,
+      "note": "Only needed to send feedback to Microsoft. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.YourPhone",
+      "title": "Phone Link",
+      "recommended": false,
+      "note": "Links an Android phone or iPhone to the PC and can run in the background once set up. Keep it if you use phone notifications, messages or calls on the PC."
+    },
+    {
+      "package": "Microsoft.ZuneMusic",
+      "title": "Media Player (Groove Music)",
+      "recommended": false,
+      "note": "The default music player. Removing it changes which app opens audio files. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.ZuneVideo",
+      "title": "Movies & TV",
+      "recommended": false,
+      "note": "The default video player on Windows 10. Removing it changes which app opens video files. Reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.WindowsSoundRecorder",
+      "title": "Voice Recorder",
+      "recommended": false,
+      "note": "Small utility that only runs when opened; harmless to keep."
+    },
+    {
+      "package": "Microsoft.Copilot",
+      "title": "Microsoft Copilot",
+      "recommended": false,
+      "note": "Microsoft's AI assistant app (runs on the EdgeCore runtime on this PC). Remove it if you don't use it; reinstallable from the Microsoft Store."
+    },
+    {
+      "package": "Microsoft.XboxGamingOverlay",
+      "title": "Xbox Game Bar",
+      "recommended": false,
+      "note": "The Win+G overlay for game capture, performance widgets and Xbox social features. To stop it popping up, turn Game Bar off in Settings instead of removing it."
+    },
+    {
+      "package": "Microsoft.XboxSpeechToTextOverlay",
+      "title": "Xbox Speech-to-Text Overlay",
+      "recommended": false,
+      "note": "Game chat transcription for accessibility; it only runs when used. Keep it if you use Xbox party chat in Game Pass games."
+    }
+  ],
+  "neverRemove": [
+    {
+      "package": "Microsoft.WindowsStore",
+      "title": "Microsoft Store",
+      "reason": "Installs, updates and reinstalls Store apps, including NVIDIA Control Panel and Game Pass components. Removed apps can't come back without it."
+    },
+    {
+      "package": "Microsoft.StorePurchaseApp",
+      "title": "Store Purchase App",
+      "reason": "Handles Store purchases and app licensing."
+    },
+    {
+      "package": "Microsoft.DesktopAppInstaller",
+      "title": "App Installer (winget)",
+      "reason": "Provides winget and .appx/.msix installation; many tools and installers depend on it."
+    },
+    {
+      "package": "Microsoft.Winget.Source",
+      "title": "winget Package Source",
+      "reason": "The package catalog winget uses."
+    },
+    {
+      "package": "Microsoft.VCLibs.*",
+      "title": "Visual C++ Runtime for Store Apps",
+      "reason": "Shared runtime framework; Store apps and games that depend on it stop launching without it."
+    },
+    {
+      "package": "Microsoft.NET.Native.*",
+      "title": ".NET Native Framework and Runtime",
+      "reason": "Shared framework packages that many Store apps need to run."
+    },
+    {
+      "package": "Microsoft.UI.Xaml.*",
+      "title": "WinUI (UI.Xaml) Framework",
+      "reason": "UI framework that the Store, Xbox apps and many others are built on."
+    },
+    {
+      "package": "Microsoft.WindowsAppRuntime.*",
+      "title": "Windows App SDK Runtime",
+      "reason": "Runtime framework for modern desktop apps."
+    },
+    {
+      "package": "Microsoft.Services.Store.Engagement",
+      "title": "Store Engagement Framework",
+      "reason": "Framework package that Store apps reference; removing it can break them."
+    },
+    {
+      "package": "Microsoft.XboxIdentityProvider",
+      "title": "Xbox Identity Provider",
+      "reason": "Signs PC games into the Xbox network. Removing it breaks sign-in for Game Pass and Xbox-enabled games."
+    },
+    {
+      "package": "Microsoft.Xbox.TCUI",
+      "title": "Xbox TCUI",
+      "reason": "In-game Xbox UI (profiles, invites, friends) that games call directly."
+    },
+    {
+      "package": "Microsoft.XboxGameCallableUI",
+      "title": "Xbox Game Callable UI",
+      "reason": "System component that games use to show Xbox dialogs."
+    },
+    {
+      "package": "Microsoft.GamingServices",
+      "title": "Gaming Services",
+      "reason": "Required to install and run PC Game Pass and Xbox app games (it isn't installed on this PC yet, but keep it if it appears)."
+    },
+    {
+      "package": "Microsoft.Windows.SecHealthUI",
+      "title": "Windows Security",
+      "reason": "The Windows Security app for Microsoft Defender, firewall and device security status."
+    },
+    {
+      "package": "Microsoft.Windows.Apprep.ChxApp",
+      "title": "SmartScreen",
+      "reason": "Microsoft Defender SmartScreen reputation checks for downloaded apps."
+    },
+    {
+      "package": "Microsoft.Windows.ShellExperienceHost",
+      "title": "Shell Experience Host",
+      "reason": "Taskbar flyouts, Action Center and other core shell UI."
+    },
+    {
+      "package": "Microsoft.Windows.StartMenuExperienceHost",
+      "title": "Start Menu",
+      "reason": "The Start menu itself."
+    },
+    {
+      "package": "Microsoft.Windows.Search",
+      "title": "Windows Search UI",
+      "reason": "The taskbar and Start search experience."
+    },
+    {
+      "package": "Microsoft.Windows.CloudExperienceHost",
+      "title": "Cloud Experience Host",
+      "reason": "Microsoft account sign-in, setup and Windows Hello flows."
+    },
+    {
+      "package": "Microsoft.AAD.BrokerPlugin",
+      "title": "Account Token Broker",
+      "reason": "Handles Microsoft and work account sign-in tokens for the Store, Office and Xbox."
+    },
+    {
+      "package": "Microsoft.AccountsControl",
+      "title": "Accounts Control",
+      "reason": "System account management UI."
+    },
+    {
+      "package": "Microsoft.LockApp",
+      "title": "Lock Screen",
+      "reason": "The lock screen."
+    },
+    {
+      "package": "windows.immersivecontrolpanel",
+      "title": "Settings",
+      "reason": "The Settings app."
+    },
+    {
+      "package": "Microsoft.Windows.ContentDeliveryManager",
+      "title": "Content Delivery Manager",
+      "reason": "System component behind the lock screen and Start content. Turn off its suggestions with the Tips and Suggestions tweak instead of removing it."
+    },
+    {
+      "package": "MicrosoftWindows.Client.CBS",
+      "title": "Windows Client Shell Components",
+      "reason": "Shell features delivered through Windows servicing."
+    },
+    {
+      "package": "Microsoft.Win32WebViewHost",
+      "title": "Desktop App Web Viewer",
+      "reason": "Hosts web content for desktop apps."
+    },
+    {
+      "package": "Microsoft.HEIFImageExtension",
+      "title": "HEIF Image Extensions",
+      "reason": "Codec used by Photos and other apps to open HEIF/HEIC images."
+    },
+    {
+      "package": "Microsoft.VP9VideoExtensions",
+      "title": "VP9 Video Extensions",
+      "reason": "Video codec used by apps and media playback."
+    },
+    {
+      "package": "Microsoft.WebMediaExtensions",
+      "title": "Web Media Extensions",
+      "reason": "OGG, Vorbis and Theora codec support for apps."
+    },
+    {
+      "package": "Microsoft.WebpImageExtension",
+      "title": "WebP Image Extensions",
+      "reason": "Codec used to open WebP images."
+    },
+    {
+      "package": "NVIDIACorp.NVIDIAControlPanel",
+      "title": "NVIDIA Control Panel",
+      "reason": "The control panel for your GTX 1070's DCH driver ships as a Store app; removing it removes your GPU settings UI."
+    },
+    {
+      "package": "RealtekSemiconductorCorp.RealtekAudioControl",
+      "title": "Realtek Audio Console",
+      "reason": "Settings app for the motherboard's Realtek audio (jack detection and enhancements)."
+    }
+  ],
+  "excluded": [
+    {
+      "name": "Disable Microsoft Defender Antivirus",
+      "reason": "Leaves the PC without malware protection (Defender is the only antivirus here). Tamper Protection is designed to block these changes anyway."
+    },
+    {
+      "name": "Add Defender exclusions for game folders or whole drives",
+      "reason": "Creates blind spots that malware can hide in. Redline never adds security exclusions."
+    },
+    {
+      "name": "Disable Windows Update (services, policies or blocking update servers)",
+      "reason": "Stops security fixes. Windows 10 22H2 is past its October 14, 2025 end of support, so Extended Security Updates are the only patches it can still get."
+    },
+    {
+      "name": "Turn off UAC (EnableLUA = 0)",
+      "reason": "Every program runs with full administrator rights, and Store/UWP apps refuse to start."
+    },
+    {
+      "name": "Disable Windows Defender Firewall",
+      "reason": "Exposes listening network services to every device on the network."
+    },
+    {
+      "name": "Disable Microsoft Defender SmartScreen",
+      "reason": "Removes reputation checks on downloaded apps and files, a main defense against fake cheats, cracks and mods that carry malware."
+    },
+    {
+      "name": "Disable Spectre/Meltdown CPU mitigations (FeatureSettingsOverride, InSpectre)",
+      "reason": "Reopens known CPU side-channel vulnerabilities, which affect Kaby Lake chips like the i7-7700."
+    },
+    {
+      "name": "Disable Memory Integrity (HVCI), virtualization-based security or Credential Guard",
+      "reason": "Weakens kernel protection against malicious and vulnerable drivers. Redline doesn't change VBS settings."
+    },
+    {
+      "name": "Disable driver signature enforcement or enable test signing",
+      "reason": "Lets unsigned kernel drivers load, which is how rootkits and many cheats get in."
+    },
+    {
+      "name": "Turn off DEP, ASLR or Control Flow Guard system-wide",
+      "reason": "Removes core memory-exploit mitigations for every program on the PC."
+    },
+    {
+      "name": "Disable Windows Security Center or its notifications",
+      "reason": "Hides warnings when protection is off or out of date."
+    },
+    {
+      "name": "Block Microsoft telemetry with hosts-file or firewall blocklists",
+      "reason": "Popular lists also block Windows Update, Defender definitions, activation and Store endpoints, and Redline can't revert them cleanly. The diagnostic data tweaks reach the same goal safely."
+    },
+    {
+      "name": "Remove Microsoft Edge or the WebView2 Runtime",
+      "reason": "Many desktop apps depend on WebView2, the Copilot app runs on the Edge runtime, and News and Interests stops working without Edge. Forced removal is unsupported and can break them."
+    },
+    {
+      "name": "Remove the Microsoft Store, App Installer, Xbox Identity Provider or framework packages",
+      "reason": "Breaks app updates, Store reinstalls (including NVIDIA Control Panel) and Xbox/Game Pass sign-in."
+    },
+    {
+      "name": "Delete or take ownership of protected system files (for example CompatTelRunner.exe)",
+      "reason": "Breaks Windows servicing: updates fail or restore the files, and SFC/DISM report corruption."
+    },
+    {
+      "name": "Disable System Restore or Volume Shadow Copy",
+      "reason": "Removes the restore points that let you roll back a bad driver or update."
+    },
+    {
+      "name": "Disable the page file",
+      "reason": "Even with 32 GB of RAM, some games and drivers expect a page file. Without one, out-of-memory crashes can happen and crash dumps can't be written."
+    },
+    {
+      "name": "CPU undervolting or power-limit unlocking (ThrottleStop, Intel XTU)",
+      "reason": "Needs a third-party kernel driver and can cause instability. Redline never changes CPU voltage, clocks or power limits."
+    },
+    {
+      "name": "Disable the telemetry service (DiagTrack)",
+      "reason": "Saves almost nothing, and third-party ESU troubleshooting guides list a disabled DiagTrack as a cause of the missing Extended Security Updates enrollment option, the only source of security patches left for Windows 10 22H2. The diagnostic data policy limits collection to Required instead. DiagTrack is already Disabled on this PC; set it back to Automatic if Windows Update doesn't offer ESU enrollment."
+    },
+    {
+      "name": "Block sponsored app auto-installs (SilentInstalledAppsEnabled)",
+      "reason": "Microsoft doesn't document this per-user value, and its documented switch ('Turn off Microsoft consumer experiences') isn't supported on Windows 10 Pro."
+    },
+    {
+      "name": "Remove Store apps the Microsoft Store no longer offers (Tips, 3D Viewer, Paint 3D, OneNote for Windows 10, People, Skype, Microsoft Pay, Maps, Cortana, Xbox Console Companion, Xbox Game Bar Plugin)",
+      "reason": "Their Store listings no longer let you get them (Microsoft removed 3D Viewer, Paint 3D and Maps from the Store), so uninstalling them couldn't be undone."
+    }
+  ]
+}

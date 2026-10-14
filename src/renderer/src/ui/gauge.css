@@ -1,0 +1,44 @@
+.rl-gauge {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.rl-gauge__svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.rl-gauge__value {
+  transition: stroke-dasharray var(--rl-dur-slow) var(--rl-ease);
+}
+
+.rl-gauge__readout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.rl-gauge__number {
+  font-size: 58px;
+  line-height: 1;
+  font-weight: 700;
+  font-stretch: var(--rl-stretch-condensed);
+  font-variant-numeric: tabular-nums;
+}
+
+.rl-gauge__unit {
+  font-size: 26px;
+  color: var(--rl-muted);
+}
+
+.rl-gauge__label {
+  font-size: 11px;
+  letter-spacing: var(--rl-tracking-eyebrow);
+  font-stretch: var(--rl-stretch-condensed);
+  color: var(--rl-muted);
+}

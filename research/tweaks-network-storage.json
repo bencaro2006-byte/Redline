@@ -1,0 +1,272 @@
+{
+  "category": "network-storage",
+  "tweaks": [
+    {
+      "id": "tcp-delayed-ack-off",
+      "title": "Disable TCP Delayed ACK",
+      "description": "Sets TcpAckFrequency to 1 on your physical network adapters, so Windows acknowledges every incoming TCP segment right away. By default Windows acknowledges every second segment, or when a 200 ms timer runs out if no second segment arrives. Immediate ACKs only help when an app sends small TCP messages with the Nagle algorithm on and ends up waiting for a delayed ACK.",
+      "category": "network",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Only affects TCP traffic. Most fast-paced online games use UDP, and TCP games can turn off Nagle themselves (TCP_NODELAY), so most games see no change.",
+      "recommended": false,
+      "recommendReason": "Microsoft advises against changing this default without careful study, and it only helps specific TCP-based apps. Leave it off unless a TCP game or app feels sluggish on your wired gigabit connection.",
+      "sideEffects": "Sends more ACK packets, which is negligible on wired gigabit Ethernet. Applies only to adapters present when you turn it on, so turn it off and on again after adding a new adapter. Turning it off removes TcpAckFrequency from every network interface, including any value you set before using Redline.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/registry-entry-control-tcp-acknowledgment-behavior",
+        "https://learn.microsoft.com/en-us/windows/win32/winsock/ipproto-tcp-socket-options"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "Get-NetAdapter -Physical | ForEach-Object { 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\' + $_.InterfaceGuid } | Where-Object { Test-Path $_ } | ForEach-Object { New-ItemProperty -Path $_ -Name 'TcpAckFrequency' -PropertyType DWord -Value 1 -Force | Out-Null }",
+          "revert": "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { Remove-ItemProperty -Path $_.PSPath -Name 'TcpAckFrequency' -ErrorAction SilentlyContinue }",
+          "detect": "$k = @(Get-NetAdapter -Physical | ForEach-Object { 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\' + $_.InterfaceGuid } | Where-Object { Test-Path $_ }); ($k.Count -gt 0) -and -not ($k | Where-Object { (Get-ItemProperty -Path $_).TcpAckFrequency -ne 1 })"
+        }
+      ]
+    },
+    {
+      "id": "nic-eee-off",
+      "title": "Disable Energy-Efficient Ethernet",
+      "description": "Turns off IEEE 802.3az Energy-Efficient Ethernet (EEE) on your wired network adapters. EEE lets the link drop into a low-power idle state between bursts of traffic and wake up again within microseconds. With it off, the link stays fully powered all the time.",
+      "category": "network",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "EEE wake-up delays are measured in microseconds, far below anything you can notice in a game, so expect no measurable change in latency or FPS. It is mainly a troubleshooting step for router and adapter combinations that drop the link or stutter with EEE on.",
+      "recommended": false,
+      "recommendReason": "Your Realtek PCIe GbE adapter has EEE enabled, but on a working wired connection turning it off brings no measurable gain. Only worth trying if you see link drops or network stutter.",
+      "sideEffects": "The adapter restarts when the setting changes, dropping the connection for a few seconds. Idle power use rises slightly. Realtek's separate Green Ethernet and Power Saving Mode options are left unchanged.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/network/standardized-inf-keywords-for-power-management",
+        "https://learn.microsoft.com/en-us/powershell/module/netadapter/set-netadapteradvancedproperty"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "@(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*EEE' }) | Set-NetAdapterAdvancedProperty -RegistryValue 0",
+          "revert": "@(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*EEE' }) | Reset-NetAdapterAdvancedProperty",
+          "detect": "$p = @(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*EEE' }); ($p.Count -gt 0) -and -not ($p | Where-Object { ($_.RegistryValue -join '') -ne '0' })"
+        }
+      ]
+    },
+    {
+      "id": "nic-interrupt-moderation-off",
+      "title": "Disable NIC Interrupt Moderation",
+      "description": "Turns off interrupt moderation on your wired network adapters, so the adapter interrupts the CPU for packets right away instead of batching several packets into one interrupt. Microsoft lists this as a tuning step for networks that need the lowest possible latency, and notes that it uses more CPU time.",
+      "category": "network",
+      "risk": "advanced",
+      "impact": "low",
+      "impactNote": "Microsoft notes that this kind of tuning cuts processing delay measured in microseconds and does not reduce the milliseconds a packet spends in transit, so expect no noticeable change in online games.",
+      "recommended": false,
+      "recommendReason": "Your online ping is measured in milliseconds while this saves microseconds, and the extra interrupts land on a 4-core/8-thread i7-7700 that games already keep busy.",
+      "sideEffects": "Higher CPU and interrupt load during heavy network traffic, such as large game downloads. The adapter restarts when the setting changes, dropping the connection for a few seconds.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/networking/technologies/network-subsystem/net-sub-performance-tuning-nics",
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/network/enumeration-keywords"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "@(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*InterruptModeration' }) | Set-NetAdapterAdvancedProperty -RegistryValue 0",
+          "revert": "@(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*InterruptModeration' }) | Reset-NetAdapterAdvancedProperty",
+          "detect": "$p = @(Get-NetAdapter -Physical | ForEach-Object { Get-NetAdapterAdvancedProperty -Name $_.Name -ErrorAction SilentlyContinue } | Where-Object { $_.RegistryKeyword -eq '*InterruptModeration' }); ($p.Count -gt 0) -and -not ($p | Where-Object { ($_.RegistryValue -join '') -ne '0' })"
+        }
+      ]
+    },
+    {
+      "id": "delivery-optimization-p2p-off",
+      "title": "Turn Off Update Peer-to-Peer Sharing",
+      "description": "Sets the Delivery Optimization download mode to HTTP only through Group Policy. Windows and Store updates then download only from Microsoft's servers and are not shared with other PCs. Windows Update keeps working normally.",
+      "category": "network",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Peer sharing is already off on this PC: Delivery Optimization reports HTTP-only (CdnOnly) mode from your Settings choice, so applying this only locks that choice in policy. Even in the Windows default (LAN) mode, sharing only happens with PCs on your own network, not over the internet.",
+      "recommended": false,
+      "recommendReason": "Peer sharing is already turned off in Settings on this PC, so the policy adds nothing except a 'managed by your organization' notice.",
+      "sideEffects": "While this is on, Windows Settings shows the Delivery Optimization option as managed by your organization and you cannot change it there. Other PCs on your network can no longer fetch updates from this one.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference",
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-deliveryoptimization"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+          "name": "DODownloadMode",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "sysmain-off",
+      "title": "Disable SysMain (Superfetch)",
+      "description": "Disables the SysMain service (formerly Superfetch), which learns which apps you use and preloads them into spare RAM. On an SSD this mostly removes some background disk and CPU activity. It does not make games run faster.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "On a SATA SSD with 32 GB of RAM the difference is usually unmeasurable either way. Microsoft's guidance is to evaluate SysMain for each setup rather than turn it off by default.",
+      "recommended": false,
+      "recommendReason": "With 32 GB of RAM, SysMain's preloading uses memory that would otherwise sit idle, and your MX500 SSD makes both its benefit and its cost small, so there is little reason to change it.",
+      "sideEffects": "App preloading stops, so frequently used apps may open slightly slower after a reboot. Memory compression is reported to rely on SysMain, so it may stop working while SysMain is disabled.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "service",
+          "name": "SysMain",
+          "startType": "Disabled",
+          "default": "Automatic"
+        }
+      ]
+    },
+    {
+      "id": "windows-search-manual",
+      "title": "Set Windows Search Indexing to Manual",
+      "description": "Changes the Windows Search service from starting automatically (delayed) at boot to Manual. The indexer then runs only after an app that uses Windows Search asks for it. This removes indexing work after boot, at the cost of slower or less complete searches until the service starts.",
+      "category": "storage",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Once your files are indexed the indexer is mostly idle, and apps that use Windows Search can still start it on demand, so it may end up running anyway. Expect no change in games.",
+      "recommended": false,
+      "recommendReason": "Your MX500 SSD handles indexing easily, and Start, File Explorer, Outlook and Edge history search on this PC rely on the index, so the trade-off is not worth it.",
+      "sideEffects": "Start menu and File Explorer searches can be slower or skip file contents until the service starts. Microsoft lists only the Automatic start types as correct for Outlook search, so Outlook may report search as unavailable. Microsoft Edge also uses the index for address-bar history results.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://support.microsoft.com/en-us/windows/search-indexing-in-windows-faq-da061c83-af6b-095c-0f7a-4dfecda4d15a",
+        "https://support.microsoft.com/en-US/Outlook/why-is-desktop-search-service-unavailable"
+      ],
+      "actions": [
+        {
+          "type": "service",
+          "name": "WSearch",
+          "startType": "Manual",
+          "default": "AutomaticDelayed"
+        }
+      ]
+    },
+    {
+      "id": "memory-compression-off",
+      "title": "Disable Memory Compression",
+      "description": "Turns off memory compression, which Windows uses to compress rarely used memory pages in RAM instead of writing them to the page file. With plenty of RAM, compression rarely happens, so there is little work to remove.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "With 32 GB, little memory gets compressed in the first place, so expect no measurable FPS change.",
+      "recommended": false,
+      "recommendReason": "With 32 GB of RAM this PC rarely compresses memory, so there is little CPU work on the i7-7700 to save. Only worth trying if you see memory compression using CPU while you game.",
+      "sideEffects": "If RAM does fill up, Windows writes more pages to the page file on your SSD instead of compressing them, and reading them back is slower. Memory compression is reported to rely on the SysMain service, so if SysMain is disabled this setting may already make no difference.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/powershell/module/mmagent/disable-mmagent",
+        "https://learn.microsoft.com/en-us/powershell/module/mmagent/get-mmagent"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "Disable-MMAgent -MemoryCompression",
+          "revert": "Enable-MMAgent -MemoryCompression",
+          "detect": "(Get-MMAgent).MemoryCompression -eq $false"
+        }
+      ]
+    },
+    {
+      "id": "ntfs-last-access-off",
+      "title": "Disable NTFS Last-Access Timestamps",
+      "description": "Stops NTFS from updating a file's 'last accessed' time when the file is read, which removes small metadata writes.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "fsutil on this PC already reports last-access updates as 'System Managed, Disabled', so this changes nothing here. On PCs where they are on, the gain is small.",
+      "recommended": false,
+      "recommendReason": "Windows already has last-access updates turned off on your 1 TB MX500 system drive by default, so there is nothing to gain.",
+      "sideEffects": "Programs that rely on last-access times, such as some backup and archiving tools, lose that information. Switches the setting from system-managed to always off; turning the tweak off restores system-managed mode.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+          "name": "NtfsDisableLastAccessUpdate",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": 2147483650
+        }
+      ]
+    },
+    {
+      "id": "ntfs-8dot3-off",
+      "title": "Disable 8.3 Short File Names",
+      "description": "Stops NTFS from creating an extra old-style 8.3 short name (like PROGRA~1) for each new file or folder with a long name, on every drive. NTFS then has one less name to generate and check when it creates files.",
+      "category": "storage",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Only measurable when creating files in folders that hold many thousands of files. Game load times and FPS are unaffected.",
+      "recommended": false,
+      "recommendReason": "Your MX500 SSD already creates files quickly, and C: is your only drive, where some older installers and apps still expect short names.",
+      "sideEffects": "Very old programs and some legacy installers that rely on short names may fail with newly created files and folders. Existing short names are kept. Takes effect after a restart.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-8dot3name",
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+          "name": "NtfsDisable8dot3NameCreation",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": 2
+        }
+      ]
+    },
+    {
+      "id": "ssd-trim-on",
+      "title": "Make Sure SSD TRIM Is Enabled",
+      "description": "Makes sure NTFS sends TRIM (delete notifications) to your SSD and that the weekly Optimize Drives task, which re-sends TRIM for all free space on SSDs, stays enabled. TRIM tells the SSD which blocks are no longer in use, which helps keep its write speed consistent over time.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Already on here (DisableDeleteNotify = 0 and the ScheduledDefrag task is Ready), so this changes nothing. It is a safeguard that only matters if another tool had turned TRIM off.",
+      "recommended": true,
+      "recommendReason": "Your Crucial MX500 is a SATA SSD that supports TRIM. This matches the Windows default and is already in effect, so keeping it selected costs nothing.",
+      "sideEffects": "None. This is the Windows default.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior",
+        "https://learn.microsoft.com/en-us/powershell/module/storage/optimize-volume"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+          "name": "DisableDeleteNotification",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 0
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\Windows\\Defrag\\ScheduledDefrag",
+          "enabled": true,
+          "defaultEnabled": true
+        }
+      ]
+    }
+  ]
+}

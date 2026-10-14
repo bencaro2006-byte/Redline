@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Redline — Debloat</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Saira:wdth,wght@75..125,300..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0C0E}
+button{font:inherit;cursor:pointer}
+a{color:#FF7A45}a:hover{color:#FFA17A}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #FF7A45;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 900px; background: #0B0C0E; color: #ECEEF1; font-family: 'Saira', system-ui, sans-serif; display: flex; flex-direction: column">
+
+<header style="display: flex; align-items: center; gap: 14px; height: 48px; padding: 0 6px 0 20px; border-bottom: 1px solid #1F2329; background: #0E1013">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17a8 8 0 1 1 16 0" stroke="#ECEEF1" stroke-width="2" stroke-linecap="round"></path><path d="M12 17l5-6" stroke="{{accent}}" stroke-width="2.4" stroke-linecap="round"></path><circle cx="12" cy="17" r="1.6" fill="{{accent}}"></circle></svg>
+<span style="font-stretch: 75%; font-weight: 800; letter-spacing: 0.2em; font-size: 15px">REDLINE</span>
+</div>
+<div style="flex: 1"></div>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; background: #15181C; border: 1px solid #262A31; font-size: 12px; color: #B7BDC6"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#46D39A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"></path></svg>Administrator</span>
+<div style="display: flex">
+<button aria-label="Minimize" style="width: 44px; height: 40px; border: 0; background: transparent; color: #9AA1AC; display: grid; place-items: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+<button aria-label="Maximize" style="width: 44px; height: 40px; border: 0; background: transparent; color: #9AA1AC; display: grid; place-items: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="1"></rect></svg></button>
+<button aria-label="Close" style="width: 44px; height: 40px; border: 0; background: transparent; color: #9AA1AC; display: grid; place-items: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; flex: 1">
+
+<nav aria-label="Main" style="flex: 1 1 220px; max-width: 248px; padding: 20px 12px; border-right: 1px solid #1F2329; background: #0E1013; display: flex; flex-direction: column; gap: 4px">
+<a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; color: #B7BDC6; text-decoration: none; font-size: 15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 15a8 8 0 1 1 16 0"></path><path d="M12 15l4-5"></path></svg>Dashboard</a>
+<a href="Optimizations.dc.html" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; color: #B7BDC6; text-decoration: none; font-size: 15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>Optimizations</a>
+<a href="SystemScan.dc.html" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; color: #B7BDC6; text-decoration: none; font-size: 15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"></path></svg>System Scan</a>
+<a href="#games" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; color: #B7BDC6; text-decoration: none; font-size: 15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9h12a4 4 0 0 1 4 4v1a3 3 0 0 1-5.2 2L15 14H9l-1.8 2A3 3 0 0 1 2 14v-1a4 4 0 0 1 4-4z"></path><path d="M8 11v3M6.5 12.5h3"></path></svg>Games</a>
+<a href="Debloat.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; background: #1A1D22; color: #ECEEF1; text-decoration: none; font-weight: 600; font-size: 15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>Debloat</a>
+<a href="#backups" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; color: #B7BDC6; text-decoration: none; font-size: 15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l3 2"></path></svg>Backups</a>
+<a href="#settings" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; color: #B7BDC6; text-decoration: none; font-size: 15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>Settings</a>
+</nav>
+
+<main style="flex: 999 1 560px; min-width: 0; padding: 28px 36px 40px; display: flex; flex-direction: column; gap: 22px">
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; letter-spacing: 0.18em; font-stretch: 75%; color: #9AA1AC">PREINSTALLED APPS · WINDOWS 10 22H2</span>
+<h1 style="margin: 0; font-size: 36px; line-height: 1.1; font-weight: 700; font-stretch: 87.5%">Debloat</h1>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<div style="flex: 1.6 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<section aria-labelledby="rec-h" style="background: #131519; border: 1px solid #23272E; border-radius: 16px; padding: 20px 22px; display: flex; flex-direction: column; gap: 2px">
+<div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px">
+<h2 id="rec-h" style="margin: 0; font-size: 18px; font-weight: 600; font-stretch: 87.5%">Safe to remove</h2>
+<button onClick="{{selectAllRec}}" style="height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid #2C3139; background: transparent; color: #ECEEF1; font-size: 13px">Select all</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 0 20px">
+<sc-for list="{{rec}}" as="app" hint-placeholder-count="10">
+<label style="flex: 1 1 260px; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 48px; border-top: 1px solid #1F2329; cursor: pointer">
+<input type="checkbox" checked="{{app.checked}}" onChange="{{app.toggle}}" style="width: 18px; height: 18px; accent-color: {{accent}}; flex: 0 0 auto">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{app.title}}</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7D8590; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{app.pkg}}</span></span>
+</label>
+</sc-for>
+</div>
+</section>
+
+<section aria-labelledby="keep-h" style="background: #131519; border: 1px solid #23272E; border-radius: 16px; padding: 20px 22px; display: flex; flex-direction: column; gap: 2px">
+<div style="display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px">
+<h2 id="keep-h" style="margin: 0; font-size: 18px; font-weight: 600; font-stretch: 87.5%">Keep if you use them</h2>
+<span style="font-size: 13px; color: #9AA1AC">Not selected by default. The Xbox apps are needed for Game Pass and Xbox sign-in.</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 0 20px">
+<sc-for list="{{keep}}" as="app" hint-placeholder-count="4">
+<label style="flex: 1 1 260px; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 48px; border-top: 1px solid #1F2329; cursor: pointer">
+<input type="checkbox" checked="{{app.checked}}" onChange="{{app.toggle}}" style="width: 18px; height: 18px; accent-color: {{accent}}; flex: 0 0 auto">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{app.title}}</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7D8590; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{app.pkg}}</span></span>
+</label>
+</sc-for>
+</div>
+</section>
+</div>
+
+<aside style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<section aria-labelledby="sel-h" style="background: #15181C; border: 1px solid #2C3139; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<span id="sel-h" style="font-size: 12px; letter-spacing: 0.18em; font-stretch: 75%; color: #9AA1AC">SELECTED</span>
+<span style="font-size: 56px; line-height: 1; font-weight: 700; font-stretch: 75%">{{count}}<span style="font-size: 20px; color: #9AA1AC"> apps</span></span>
+<span style="font-size: 13px; color: #9AA1AC">Removed for every user on this PC. Any of them can be reinstalled from the Microsoft Store.</span>
+<button style="height: 48px; border-radius: 10px; border: 0; background: {{removeBg}}; color: {{removeFg}}; font-weight: 700; font-size: 15px">Remove {{count}} apps</button>
+</section>
+<section aria-labelledby="prot-h" style="background: #131519; border: 1px solid #23272E; border-radius: 16px; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px">
+<h2 id="prot-h" style="margin: 0; font-size: 16px; font-weight: 600; font-stretch: 87.5%">Never touched</h2>
+<span style="font-size: 13px; color: #9AA1AC; line-height: 1.5">Microsoft Store · App Installer · Windows Security · Xbox Identity Provider · system runtimes</span>
+</section>
+<section aria-labelledby="not-h" style="background: #131519; border: 1px solid #23272E; border-radius: 16px; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px">
+<h2 id="not-h" style="margin: 0; font-size: 16px; font-weight: 600; font-stretch: 87.5%">Not offered, and why</h2>
+<span style="font-size: 13px; color: #9AA1AC; line-height: 1.5">Turning off Defender, Windows Update, UAC or the firewall gives no measurable FPS and leaves the PC exposed. Redline does not include them.</span>
+</section>
+</aside>
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#FF5A1F","options":["#FF5A1F","#FF3B4E","#FFB020","#5CC8FF"]},"$preview":{"width":1360,"height":900}}'>
+const REC = [
+{ pkg: 'Microsoft.BingNews', title: 'Microsoft News' },
+{ pkg: 'Microsoft.BingWeather', title: 'Weather' },
+{ pkg: 'Microsoft.GetHelp', title: 'Get Help' },
+{ pkg: 'Microsoft.Getstarted', title: 'Tips' },
+{ pkg: 'Microsoft.Microsoft3DViewer', title: '3D Viewer' },
+{ pkg: 'Microsoft.MicrosoftOfficeHub', title: 'Office hub' },
+{ pkg: 'Microsoft.MicrosoftSolitaireCollection', title: 'Solitaire Collection' },
+{ pkg: 'Microsoft.MixedReality.Portal', title: 'Mixed Reality Portal' },
+{ pkg: 'Microsoft.People', title: 'People' },
+{ pkg: 'Microsoft.SkypeApp', title: 'Skype' },
+{ pkg: 'Microsoft.WindowsFeedbackHub', title: 'Feedback Hub' },
+{ pkg: 'Microsoft.WindowsMaps', title: 'Maps' },
+{ pkg: 'Microsoft.ZuneVideo', title: 'Movies & TV' },
+{ pkg: 'Microsoft.MSPaint', title: 'Paint 3D' }
+];
+const KEEP = [
+{ pkg: 'Microsoft.XboxApp', title: 'Xbox Console Companion' },
+{ pkg: 'Microsoft.XboxGamingOverlay', title: 'Xbox Game Bar' },
+{ pkg: 'Microsoft.YourPhone', title: 'Your Phone' },
+{ pkg: 'Microsoft.ZuneMusic', title: 'Groove Music' }
+];
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+const sel = {};
+REC.slice(0, 9).forEach((a) => { sel[a.pkg] = true; });
+this.state = { sel: sel };
+}
+renderVals() {
+const accent = this.props.accent ?? '#FF5A1F';
+const sel = this.state.sel;
+const map = (list) => list.map((a) => ({
+title: a.title,
+pkg: a.pkg,
+checked: !!sel[a.pkg],
+toggle: () => this.setState((prev) => ({ sel: Object.assign({}, prev.sel, { [a.pkg]: !prev.sel[a.pkg] }) }))
+}));
+const count = REC.concat(KEEP).filter((a) => !!sel[a.pkg]).length;
+return {
+accent: accent,
+rec: map(REC),
+keep: map(KEEP),
+count: count,
+removeBg: count > 0 ? accent : '#23272E',
+removeFg: count > 0 ? '#0B0C0E' : '#7D8590',
+selectAllRec: () => this.setState((prev) => {
+const next = Object.assign({}, prev.sel);
+REC.forEach((a) => { next[a.pkg] = true; });
+return { sel: next };
+})
+};
+}
+}
+</script>
+</body>
+</html>

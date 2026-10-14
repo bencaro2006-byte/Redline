@@ -1,0 +1,10 @@
+// Engine public surface (other modules import only from here).
+export { probe, probeDetailed, type ProbeOutcome } from './probe'
+export { invoke } from './invoke'
+export { detectTweaks, invalidateDetectCache } from './detect'
+export { applyTweaks } from './apply'
+export { revertBackup } from './revert'
+export { createRestorePoint, RESTORE_POINT_DESCRIPTION } from './restorePoint'
+export { BackupStore, getBackupStore, listBackups, type NewBackup } from './backups'
+export { trustedRestoreItems } from './trust'
+export type { ApplyOptions, EngineDeps, InvokeItem, InvokeOp, InvokeResult, ProbeItem, RestorePointOptions } from './types'

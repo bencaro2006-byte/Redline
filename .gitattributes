@@ -1,0 +1,5 @@
+# Keep LF everywhere: the build embeds SHA-256 checksums of the PowerShell scripts,
+# so line endings must not change between clone and build.
+* text=auto eol=lf
+*.ico binary
+*.png binary

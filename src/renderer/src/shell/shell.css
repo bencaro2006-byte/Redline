@@ -1,0 +1,222 @@
+/* App frame: fixed title bar, nav rail, scrolling main area. */
+.rl-app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: calc(var(--rl-titlebar-h) + 1px) minmax(0, 1fr);
+  grid-template-columns: var(--rl-nav-w) minmax(0, 1fr);
+  grid-template-areas:
+    'title title'
+    'nav main';
+  background: var(--rl-bg);
+}
+
+/* ---------- Title bar ---------- */
+.rl-titlebar {
+  grid-area: title;
+  position: relative;
+  background: var(--rl-chrome);
+  /* 48px content + 1px hairline: the native overlay is 48px tall, so the line stays visible under it. */
+  border-bottom: 1px solid var(--rl-hairline);
+}
+
+.rl-titlebar__drag {
+  position: absolute;
+  top: env(titlebar-area-y, 0);
+  left: env(titlebar-area-x, 0);
+  width: env(titlebar-area-width, 100%);
+  height: env(titlebar-area-height, var(--rl-titlebar-h));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 0 20px;
+  -webkit-app-region: drag;
+  app-region: drag;
+  user-select: none;
+}
+
+.rl-titlebar__drag :is(button, a, input, select, textarea, [role='button'], [role='switch'], [title]) {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.rl-titlebar__spacer {
+  flex: 1;
+}
+
+.rl-titlebar__icon--admin {
+  color: var(--rl-admin);
+}
+
+.rl-titlebar__icon--warn {
+  color: var(--rl-fix-fg);
+}
+
+.rl-titlebar__icon--dry {
+  color: var(--rl-info-fg);
+}
+
+.rl-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rl-logo__word {
+  font-stretch: var(--rl-stretch-condensed);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  font-size: 15px;
+}
+
+/* ---------- Nav rail ---------- */
+.rl-nav {
+  grid-area: nav;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 12px;
+  background: var(--rl-chrome);
+  border-right: 1px solid var(--rl-hairline);
+}
+
+.rl-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rl-nav__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--rl-radius-md);
+  background: transparent;
+  color: var(--rl-text-2);
+  font-size: 15px;
+  text-align: left;
+  transition:
+    background-color var(--rl-dur-fast) ease,
+    color var(--rl-dur-fast) ease;
+}
+
+.rl-nav__item:hover {
+  background: var(--rl-surface-raised);
+  color: var(--rl-text);
+}
+
+.rl-nav__item--active,
+.rl-nav__item--active:hover {
+  background: var(--rl-surface-2);
+  color: var(--rl-text);
+  font-weight: 600;
+}
+
+.rl-nav__icon {
+  flex: 0 0 auto;
+}
+
+.rl-nav__item--active .rl-nav__icon {
+  color: var(--rl-accent);
+}
+
+.rl-nav__spacer {
+  flex: 1;
+  min-height: 24px;
+}
+
+.rl-nav__pc {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--rl-surface-1);
+  border: 1px solid var(--rl-hairline-2);
+}
+
+.rl-nav__pc-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  font-stretch: var(--rl-stretch-condensed);
+  color: var(--rl-muted);
+}
+
+.rl-nav__pc-headline {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rl-nav__pc-detail {
+  font-size: 12px;
+  color: var(--rl-muted);
+}
+
+/* ---------- Main ---------- */
+.rl-main {
+  grid-area: main;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.rl-boot {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--rl-muted);
+}
+
+/* ---------- Status banner (dry run / not elevated) ---------- */
+.rl-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 36px 0;
+  padding: 10px 14px;
+  border-radius: var(--rl-radius-md);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.rl-banner--info {
+  background: var(--rl-info-bg);
+  color: var(--rl-info-fg);
+}
+
+.rl-banner--warn {
+  background: var(--rl-fix-bg);
+  color: var(--rl-fix-fg);
+}
+
+.rl-banner > svg {
+  flex: 0 0 auto;
+}
+
+.rl-banner > span {
+  flex: 1;
+}
+
+.rl-banner__action {
+  flex: 0 0 auto;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid currentColor;
+  border-radius: var(--rl-radius-sm);
+  background: transparent;
+  color: inherit;
+  font-size: 12.5px;
+}
+
+.rl-banner__action:hover {
+  background: rgb(255 255 255 / 0.06);
+}

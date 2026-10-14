@@ -1,0 +1,12 @@
+// Shared UI primitives (scaffold-owned). Screens and features import from '@renderer/ui'.
+export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button'
+export { Toggle, type ToggleProps } from './Toggle'
+export { Chip, ImpactChip, RiskChip, StatusChip, type ChipProps, type ChipVariant } from './Chip'
+export { Card, CardRow, type CardProps } from './Card'
+export { Gauge, type GaugeProps } from './Gauge'
+export { Meter, type MeterProps } from './Meter'
+export { Modal, type ModalProps } from './Modal'
+export { ToastProvider, useToast, type ToastInput, type ToastTone } from './Toast'
+export { EmptyState, type EmptyStateProps } from './EmptyState'
+export { Skeleton, SkeletonText, type SkeletonProps } from './Skeleton'
+export { Page, PageHeader, type PageHeaderProps } from './PageHeader'

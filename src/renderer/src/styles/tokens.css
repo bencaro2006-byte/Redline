@@ -1,0 +1,81 @@
+/* Design tokens from design/project/*.dc.html (graphite + redline orange). */
+:root {
+  /* Ground and surfaces */
+  --rl-bg: #0b0c0e;
+  --rl-chrome: #0e1013; /* title bar + nav rail */
+  --rl-surface-1: #131519; /* cards */
+  --rl-surface-2: #1a1d22; /* active nav, subtle buttons, category chips */
+  --rl-surface-raised: #15181c; /* pills, secondary buttons, sticky bars */
+  --rl-surface-hover: #1e2228;
+
+  /* Hairlines and control borders */
+  --rl-hairline: #1f2329; /* row dividers, meter tracks */
+  --rl-hairline-2: #23272e; /* card borders */
+  --rl-border-pill: #262a31;
+  --rl-border-control: #2c3139;
+  --rl-tick: #3a3f48;
+
+  /* Text */
+  --rl-text: #eceef1;
+  --rl-text-2: #b7bdc6;
+  --rl-muted: #9aa1ac;
+  --rl-faint: #7d8590;
+
+  /* Accent (redline) */
+  --rl-accent: #ff5a1f;
+  --rl-accent-ink: #0b0c0e; /* text on accent */
+  --rl-accent-link: #ff7a45;
+  --rl-accent-link-hover: #ffa17a;
+  --rl-accent-soft-fg: #ff9d73;
+  --rl-accent-soft-bg: #2a1a12; /* medium impact */
+  --rl-accent-strong-bg: #3a1a10; /* high impact */
+  --rl-accent-border: #5a2e1c; /* pending change outline */
+  --rl-focus: #ff7a45;
+
+  /* Data */
+  --rl-data: #5cc8ff;
+
+  /* Status */
+  --rl-ok-fg: #6fe3b2;
+  --rl-ok-bg: #0f2a20;
+  --rl-fix-fg: #ffc46b;
+  --rl-fix-bg: #3a2a0e;
+  --rl-info-fg: #8fd6ff;
+  --rl-info-bg: #12243a;
+  --rl-danger-fg: #ff8a80;
+  --rl-danger-bg: #3a1414;
+  --rl-admin: #46d39a;
+  --rl-neutral-bg: #1a1f26; /* low impact */
+
+  /* Controls */
+  --rl-toggle-off: #2a2e35;
+  --rl-toggle-knob-off: #9aa1ac;
+
+  /* Type */
+  --rl-font-sans: 'Saira Variable', 'Saira', system-ui, 'Segoe UI', sans-serif;
+  --rl-font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --rl-stretch-condensed: 75%;
+  --rl-stretch-semi: 87.5%;
+  --rl-tracking-eyebrow: 0.18em;
+
+  /* Radii */
+  --rl-radius-chip: 5px;
+  --rl-radius-sm: 8px;
+  --rl-radius-md: 10px;
+  --rl-radius-lg: 14px;
+  --rl-radius-xl: 16px;
+  --rl-radius-pill: 999px;
+
+  /* Layout */
+  --rl-titlebar-h: 48px;
+  --rl-nav-w: 248px;
+  --rl-page-pad: 28px 36px 40px;
+
+  /* Motion */
+  --rl-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --rl-dur-fast: 120ms;
+  --rl-dur: 220ms;
+  --rl-dur-slow: 700ms;
+
+  --rl-shadow-pop: 0 18px 50px rgb(0 0 0 / 0.55), 0 2px 8px rgb(0 0 0 / 0.4);
+}

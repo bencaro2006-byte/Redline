@@ -1,0 +1,42 @@
+.rl-page {
+  min-height: 100%;
+  padding: var(--rl-page-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.rl-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rl-page-header__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rl-page-header__title {
+  font-size: 36px;
+  line-height: 1.1;
+  font-weight: 700;
+  font-stretch: var(--rl-stretch-semi);
+}
+
+.rl-page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Responsive row of cards: children set their own flex basis. */
+.rl-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}

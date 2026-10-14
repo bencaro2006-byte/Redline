@@ -1,0 +1,43 @@
+.rl-toggle {
+  flex: 0 0 auto;
+  position: relative;
+  width: 48px;
+  height: 28px;
+  padding: 3px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--rl-toggle-off);
+  transition: background-color var(--rl-dur) var(--rl-ease);
+}
+
+.rl-toggle__knob {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--rl-toggle-knob-off);
+  transition:
+    transform var(--rl-dur) var(--rl-ease),
+    background-color var(--rl-dur) var(--rl-ease);
+}
+
+.rl-toggle--on {
+  background: var(--rl-accent);
+}
+
+.rl-toggle--on .rl-toggle__knob {
+  transform: translateX(20px);
+  background: var(--rl-accent-ink);
+}
+
+.rl-toggle:hover:not(:disabled):not(.rl-toggle--on) {
+  background: #343943;
+}
+
+.rl-toggle--pending {
+  box-shadow: 0 0 0 2px var(--rl-accent-border);
+}
+
+.rl-toggle:disabled {
+  opacity: 0.45;
+}

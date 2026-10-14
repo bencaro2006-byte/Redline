@@ -1,0 +1,366 @@
+{
+  "category": "power-scheduling-gpu",
+  "tweaks": [
+    {
+      "id": "ultimate-performance-plan",
+      "title": "Ultimate Performance Power Plan",
+      "description": "Copies Windows' hidden Ultimate Performance plan and makes it active. On mains power it sets the minimum processor state to 100%, never turns off the disk and turns off PCIe and SATA link power saving. On this PC its mains-power settings match High performance except that the disk never turns off.",
+      "category": "power",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Small at best. GPU-bound games should see no FPS change; CPU-heavy games may get slightly steadier frame times because the CPU never has to clock up first. On this PC its mains-power settings are identical to High performance apart from 'Turn off hard disk after: Never'.",
+      "recommended": true,
+      "recommendReason": "Mains-powered desktop whose 4-core i7-7700 can be the bottleneck in newer games, so the extra idle power is the only real cost. It already covers the minimum-processor-state, PCIe and SATA link tweaks, so those are not pre-selected separately.",
+      "sideEffects": "Higher idle power draw and CPU temperature; Microsoft notes it uses more power than Balanced. The plan never puts the PC to sleep on mains power (the display still turns off after 15 minutes), so set 'Sleep after' yourself if you rely on auto-sleep. Reverting re-activates your previous plan; the copied plan stays listed in Power Options.",
+      "requiresReboot": false,
+      "sources": [
+        "https://blogs.windows.com/windows-insider/2018/02/14/announcing-windows-10-insider-preview-build-17101-fast-build-17604-skip-ahead/",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "powerScheme",
+          "scheme": "ultimate"
+        }
+      ]
+    },
+    {
+      "id": "disable-power-throttling",
+      "title": "Disable Power Throttling",
+      "description": "Turns off Windows Power Throttling, which can run background apps at the CPU's most efficient, slower speeds. Uses the same registry value as the built-in 'Turn off Power Throttling' Group Policy.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "None expected on this PC. On Windows 10, Power Throttling only slows background apps on battery and only on CPUs that expose Intel Speed Shift; this PC's firmware exposes legacy ACPI P-states instead.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: this desktop always runs on mains power and does not expose Speed Shift, so Windows has nothing to throttle here.",
+      "sideEffects": "On a laptop running on battery, background apps can use more power. No noticeable effect on this desktop.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/procthread/quality-of-service",
+        "https://blogs.windows.com/windowsexperience/2017/04/18/introducing-power-throttling/"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+          "name": "PowerThrottlingOff",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "processor-min-state-100",
+      "title": "Processor Minimum State 100% (Plugged In)",
+      "description": "Sets the active power plan's minimum processor state to 100% on mains power, so Windows asks for full CPU speed (3.6 GHz base or higher) whenever a core is busy instead of ramping up from low clocks. Idle cores can still drop into their power-saving sleep states.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Small: during games the CPU is already busy and clocked up, so this mainly shortens clock ramp-up on short, bursty loads. Ultimate Performance already sets it.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected because the recommended Ultimate Performance plan already sets 100%; apply it on its own if you stay on Balanced (default 5%).",
+      "sideEffects": "Somewhat higher idle power and temperature; idle sleep states still work, so the increase is modest. Changes only the plan that is active when you apply it. Battery (DC) value is left at the default.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/options-for-perf-state-engine-minperformance",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "powercfg",
+          "subgroup": "54533251-82be-4824-96c1-47b60b740d00",
+          "setting": "893dee8e-2bef-41e0-89c6-b55d0929964c",
+          "ac": 100,
+          "dc": 5,
+          "defaultAc": 5,
+          "defaultDc": 5,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "id": "disable-usb-selective-suspend",
+      "title": "Disable USB Selective Suspend (Plugged In)",
+      "description": "Stops Windows from suspending idle USB devices while on mains power. Can fix controllers, headsets or wireless dongles that disconnect or respond late after sitting idle.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change; it only helps if a USB device drops out or lags when it wakes from idle.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: Microsoft strongly recommends leaving selective suspend on, and it only matters if one of this PC's USB devices misbehaves after idling.",
+      "sideEffects": "Idle USB devices stay powered, which can keep the CPU out of its deepest idle states and raise idle power slightly. Changes only the plan that is active when you apply it.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/usbcon/usb-selective-suspend",
+        "https://learn.microsoft.com/en-us/troubleshoot/microsoftteams/teams-rooms-and-devices/usb-selective-suspend-status-unhealthy"
+      ],
+      "actions": [
+        {
+          "type": "powercfg",
+          "subgroup": "2a737441-1930-4402-8d77-b2bebba308a3",
+          "setting": "48e6b7a6-50f5-4782-a5d4-53bb8f07e226",
+          "ac": 0,
+          "dc": 1,
+          "defaultAc": 1,
+          "defaultDc": 1,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "id": "disable-pcie-aspm",
+      "title": "Disable PCIe Link State Power Management",
+      "description": "Turns off PCI Express Active State Power Management (ASPM) on mains power, so PCIe links such as the GTX 1070's are not put into low-power states when idle. It only takes effect if the motherboard firmware lets Windows control ASPM.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No measurable FPS change: a PCIe link wakes up in microseconds. Ultimate Performance already sets Off.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected because Ultimate Performance already turns it off; harmless on this mains-powered desktop if you stay on Balanced (default Moderate).",
+      "sideEffects": "Slightly higher idle power draw. Changes only the plan that is active when you apply it. Battery (DC) value is left at the default.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/pci-express-settings-link-state-power-management",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "powercfg",
+          "subgroup": "501a4d13-42af-4429-9fd1-a8218c268e20",
+          "setting": "ee12f906-d277-404b-b6da-e5fa1a576df5",
+          "ac": 0,
+          "dc": 2,
+          "defaultAc": 1,
+          "defaultDc": 2,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "id": "disable-sata-link-power-management",
+      "title": "Disable SATA Link Power Management",
+      "description": "Sets AHCI link power management to Active on mains power, so the SATA link to the Crucial MX500 never enters its Partial or Slumber low-power states. Removes the short delay on the first access after an idle pause.",
+      "category": "storage",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change. Waking a SATA link takes microseconds (Partial) up to about 10 ms (Slumber), so at most the first read after an idle pause is marginally quicker. Ultimate Performance already sets Active.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected because Ultimate Performance already sets it. The MX500, the only drive, runs on Microsoft's built-in storahci AHCI driver, which this setting is meant for.",
+      "sideEffects": "Slightly higher idle power for the SSD and SATA controller. Changes only the plan that is active when you apply it. Battery (DC) value is left at the default.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/disk-settings-link-power-management-mode---hipm-dipm",
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/storport/nf-storport-storportsetpowersettingnotificationguids",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "powercfg",
+          "subgroup": "0012ee47-9041-4b5d-9b77-535fba8b1442",
+          "setting": "0b2d69d7-a2a1-449c-9680-f91c70521c60",
+          "ac": 0,
+          "dc": 1,
+          "defaultAc": 1,
+          "defaultDc": 1,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "disable-fast-startup",
+      "title": "Disable Fast Startup",
+      "description": "Makes Shut down a full shutdown instead of saving the Windows kernel and drivers to hiberfil.sys for the next start. Every power-on after Shut down then starts drivers fresh, as Restart already does.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change, and no change on this PC today: Fast Startup needs hibernation, which is already off here. It only matters if hibernation is turned back on.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: Fast Startup is already unavailable on this PC because hibernation is off. Use this instead of disabling hibernation if you want to keep Hibernate.",
+      "sideEffects": "Power-on from Shut down is slower because Windows does a full boot. Takes effect from the next shutdown.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/configuration/unified-write-filter/hibernate-once-resume-many-horm",
+        "https://learn.microsoft.com/en-us/windows/win32/power/system-power-states"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+          "name": "HiberbootEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "id": "disable-hibernation",
+      "title": "Disable Hibernation",
+      "description": "Turns hibernation off and deletes hiberfil.sys, which also removes Fast Startup and hybrid sleep. Frees the disk space that file reserves, which grows with the amount of RAM.",
+      "category": "power",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change; the only gain is disk space. Hibernation is already off on this PC, so applying this changes nothing.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: hibernation is already off here, so there is nothing to gain. On a PC where it is on, it trades Fast Startup and hybrid sleep's protection against power cuts for several GB of disk space.",
+      "sideEffects": "Hibernate, hybrid sleep and Fast Startup become unavailable. Without hybrid sleep, a power cut while the PC is asleep loses unsaved work. Power-on from Shut down is slower. If hibernation was on before, reverting runs 'powercfg /hibernate on', which recreates hiberfil.sys.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-client/setup-upgrade-and-drivers/disable-and-re-enable-hibernation",
+        "https://learn.microsoft.com/en-us/windows/win32/power/system-power-states",
+        "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options"
+      ],
+      "actions": [
+        {
+          "type": "command",
+          "apply": "& \"$env:SystemRoot\\System32\\powercfg.exe\" /hibernate off",
+          "revert": "& \"$env:SystemRoot\\System32\\powercfg.exe\" /hibernate on",
+          "detect": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power' -Name HibernateEnabled -ErrorAction SilentlyContinue).HibernateEnabled -eq 0"
+        }
+      ]
+    },
+    {
+      "id": "mmcss-system-responsiveness-10",
+      "title": "MMCSS System Responsiveness 10%",
+      "description": "Lowers the share of CPU time that the Multimedia Class Scheduler (MMCSS) keeps free for ordinary programs from 20% to 10%, the lowest value that takes effect. Threads that register with MMCSS, mainly audio and some game threads, can then stay boosted for longer before Windows holds them back.",
+      "category": "scheduling",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Usually not measurable: it only matters when MMCSS-registered threads are saturating the CPU, which is rare in games. Windows treats values below 10 as 20, so the popular setting of 0 does nothing.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: no measurable benefit is expected on this PC. If you want it, 10 is the lowest value Microsoft documents as taking effect, unlike the ineffective 0 found in many tweak guides.",
+      "sideEffects": "Background apps such as voice chat or streaming tools get a smaller guaranteed CPU share while MMCSS threads are saturating the CPU.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+          "name": "SystemResponsiveness",
+          "valueType": "REG_DWORD",
+          "value": 10,
+          "default": 20
+        }
+      ]
+    },
+    {
+      "id": "disable-network-throttling",
+      "title": "Disable Multimedia Network Throttling",
+      "description": "Sets NetworkThrottlingIndex to 0xFFFFFFFF so Windows stops limiting how many incoming network packets it processes while multimedia playback (MMCSS) is active. By default that limit is 10 packets per millisecond.",
+      "category": "network",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No effect on online games, whose traffic is far below 10,000 packets per second. At most it can speed up very fast LAN transfers made during media playback. Already set on this PC.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: it does nothing for game latency on this PC and only helps fast LAN copies during media playback.",
+      "sideEffects": "Very heavy network traffic during playback can cause audio or video glitches on weak CPUs; unlikely on an i7-7700.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/archive/blogs/markrussinovich/vista-multimedia-playback-and-network-throughput",
+        "https://learn.microsoft.com/en-us/answers/questions/2420607/ping-problems",
+        "https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+          "name": "NetworkThrottlingIndex",
+          "valueType": "REG_DWORD",
+          "value": 4294967295,
+          "default": 10
+        }
+      ]
+    },
+    {
+      "id": "mmcss-games-high-category",
+      "title": "MMCSS Games Task: High Category",
+      "description": "Moves the MMCSS 'Games' task from the Medium to the High scheduling category, so game threads that register with MMCSS as 'Games' run at priority 23-26 instead of 16-22.",
+      "category": "scheduling",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "No change in most games, because few games register their threads with MMCSS as 'Games'. Microsoft documents 'GPU Priority' and 'SFIO Priority' as unused and 'Priority' as always 2 in the High category, so only the category is changed.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: little benefit for most games on this PC and a small risk of crackling audio.",
+      "sideEffects": "Registered game threads would outrank Windows' normal audio threads (Medium category), which can cause crackling audio in games that keep those threads busy.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+          "name": "Scheduling Category",
+          "valueType": "REG_SZ",
+          "value": "High",
+          "default": "Medium"
+        }
+      ]
+    },
+    {
+      "id": "hardware-accelerated-gpu-scheduling",
+      "title": "Hardware-Accelerated GPU Scheduling",
+      "description": "Turns on Hardware-accelerated GPU scheduling, the switch under Settings > System > Display > Graphics settings. Frequent GPU scheduling work moves from the CPU to a scheduling processor on the GTX 1070; Windows still decides priorities. dxdiag on this PC reports it as supported (WDDM 2.7, driver 582.53).",
+      "category": "gpu",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Usually nothing you can measure: Microsoft says users should not notice significant changes, and NVIDIA says only that it can potentially improve performance and latency. Already on for this PC.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: it is already on here, the benefit is unproven, and results can differ between games, so whether to keep it is your call.",
+      "sideEffects": "If a game, capture tool or VR app stutters or misbehaves with it on, revert it. Reverting restores the previous state; resetting to Windows defaults removes the value, which means off on Windows 10. Microsoft documents the Settings switch, not this registry value; HwSchMode=2 is what that switch wrote on this PC.",
+      "requiresReboot": true,
+      "sources": [
+        "https://devblogs.microsoft.com/directx/hardware-accelerated-gpu-scheduling/",
+        "https://www.nvidia.com/en-us/geforce/news/directx-12-ultimate-game-ready-driver/"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "name": "HwSchMode",
+          "valueType": "REG_DWORD",
+          "value": 2,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "disable-paging-executive",
+      "title": "Keep Kernel and Drivers in RAM",
+      "description": "Sets DisablePagingExecutive so kernel-mode drivers and Windows system code always stay in RAM instead of being paged out to disk when unused.",
+      "category": "scheduling",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Usually not measurable: with 32 GB of RAM Windows seldom pages kernel code out, so at most it avoids an occasional disk read after long idle periods. Microsoft's performance note for this value dates from Windows Server 2003.",
+      "recommended": false,
+      "recommendReason": "Not pre-selected: no measurable gain is expected with 32 GB of RAM. Harmless to apply if you want it, since the memory it pins is a tiny fraction of 32 GB.",
+      "sideEffects": "Kernel code and drivers permanently use a little more RAM.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc757875(v=ws.10)",
+        "https://learn.microsoft.com/en-us/archive/blogs/irenak/sysk-318-registry-key-that-controls-device-driver-and-system-code-pagination-to-disk"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+          "name": "DisablePagingExecutive",
+          "valueType": "REG_DWORD",
+          "value": 1,
+          "default": 0
+        }
+      ]
+    }
+  ]
+}

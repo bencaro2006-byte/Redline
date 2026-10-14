@@ -1,0 +1,38 @@
+.rl-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rl-meter__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.rl-meter__label {
+  color: var(--rl-text-2);
+}
+
+.rl-meter__track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--rl-hairline);
+  overflow: hidden;
+}
+
+.rl-meter__fill {
+  height: 100%;
+  border-radius: 3px;
+  transform-origin: left center;
+  transition: transform 600ms var(--rl-ease);
+}
+
+.rl-meter__fill--data {
+  background: var(--rl-data);
+}
+
+.rl-meter__fill--accent {
+  background: var(--rl-accent);
+}

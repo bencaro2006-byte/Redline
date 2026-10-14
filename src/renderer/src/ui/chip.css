@@ -1,0 +1,94 @@
+.rl-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--rl-radius-chip);
+  border: 1px solid transparent;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.rl-chip--impact-high {
+  background: var(--rl-accent-strong-bg);
+  color: var(--rl-accent-soft-fg);
+  font-weight: 700;
+}
+
+.rl-chip--impact-medium {
+  background: var(--rl-accent-soft-bg);
+  color: var(--rl-accent-soft-fg);
+  font-weight: 700;
+}
+
+.rl-chip--impact-low {
+  background: var(--rl-neutral-bg);
+  color: var(--rl-muted);
+  font-weight: 700;
+}
+
+.rl-chip--risk {
+  border-color: var(--rl-border-control);
+  color: var(--rl-text-2);
+}
+
+.rl-chip--risk-advanced {
+  border-color: var(--rl-fix-bg);
+  color: var(--rl-fix-fg);
+}
+
+.rl-chip--ok,
+.rl-chip--fix,
+.rl-chip--info,
+.rl-chip--danger {
+  padding: 0 7px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.rl-chip--ok {
+  background: var(--rl-ok-bg);
+  color: var(--rl-ok-fg);
+}
+
+.rl-chip--fix {
+  background: var(--rl-fix-bg);
+  color: var(--rl-fix-fg);
+}
+
+.rl-chip--info {
+  background: var(--rl-info-bg);
+  color: var(--rl-info-fg);
+}
+
+.rl-chip--danger {
+  background: var(--rl-danger-bg);
+  color: var(--rl-danger-fg);
+}
+
+.rl-chip--category {
+  background: var(--rl-surface-2);
+  color: var(--rl-text-2);
+}
+
+.rl-chip--reboot {
+  border-color: var(--rl-fix-bg);
+  color: var(--rl-fix-fg);
+}
+
+.rl-chip--pill {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--rl-radius-pill);
+  background: var(--rl-surface-raised);
+  border-color: var(--rl-border-pill);
+  color: var(--rl-text-2);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+}

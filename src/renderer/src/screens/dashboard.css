@@ -1,0 +1,156 @@
+.rl-dash__score {
+  flex: 1.5 1 460px;
+}
+
+.rl-dash__score-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 30px;
+}
+
+.rl-dash__score-text {
+  flex: 1 1 240px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rl-dash__score-line {
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 600;
+  font-stretch: var(--rl-stretch-semi);
+}
+
+.rl-dash__score-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.rl-dash__score-note {
+  font-size: 13px;
+  color: var(--rl-muted);
+}
+
+.rl-dash__live {
+  flex: 1 1 320px;
+  gap: 16px;
+}
+
+.rl-dash__live-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rl-dash__next {
+  flex: 1.5 1 460px;
+}
+
+.rl-dash__health {
+  flex: 1 1 320px;
+}
+
+.rl-dash__row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rl-dash__row-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rl-dash__row-desc {
+  font-size: 13px;
+  color: var(--rl-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rl-dash__row-desc--wrap {
+  white-space: normal;
+}
+
+.rl-dash__check {
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.rl-dash__check-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rl-dash__tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.rl-dash__tile {
+  flex: 1 1 200px;
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--rl-radius-lg);
+  background: var(--rl-surface-1);
+  border: 1px solid var(--rl-hairline-2);
+  color: var(--rl-text);
+  text-align: left;
+  transition:
+    border-color var(--rl-dur-fast) ease,
+    background-color var(--rl-dur-fast) ease,
+    transform var(--rl-dur) var(--rl-ease);
+}
+
+.rl-dash__tile:hover {
+  background: var(--rl-surface-raised);
+  border-color: var(--rl-border-control);
+  transform: translateY(-1px);
+}
+
+.rl-dash__tile-icon {
+  color: var(--rl-text-2);
+}
+
+.rl-dash__tile:hover .rl-dash__tile-icon {
+  color: var(--rl-accent);
+}
+
+.rl-dash__tile-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rl-dash__tile-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rl-dash__tile-note {
+  font-size: 13px;
+  color: var(--rl-muted);
+}
+
+.rl-dash__tile-arrow {
+  color: var(--rl-faint);
+  transition: transform var(--rl-dur) var(--rl-ease);
+}
+
+.rl-dash__tile:hover .rl-dash__tile-arrow {
+  transform: translateX(3px);
+  color: var(--rl-text-2);
+}

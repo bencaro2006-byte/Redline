@@ -1,0 +1,160 @@
+/* Self-hosted fonts (CSP font-src 'self'). Saira variable with the wdth axis. */
+@import '@fontsource-variable/saira/wdth.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/600.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--rl-bg);
+  color: var(--rl-text);
+  font-family: var(--rl-font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: none;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  color: var(--rl-accent-link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--rl-accent-link-hover);
+}
+
+input::placeholder {
+  color: var(--rl-faint);
+}
+
+/* Selectable text where it is useful (values, reports). */
+.rl-selectable,
+dd,
+code,
+pre {
+  user-select: text;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--rl-focus);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgb(255 90 31 / 0.35);
+}
+
+/* Scrollbars that sit on the graphite ground. */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #262a31;
+  border: 3px solid var(--rl-bg);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #353a43;
+}
+
+/* Shared typographic helpers */
+.rl-eyebrow {
+  font-size: 12px;
+  letter-spacing: var(--rl-tracking-eyebrow);
+  font-stretch: var(--rl-stretch-condensed);
+  text-transform: uppercase;
+  color: var(--rl-muted);
+}
+
+.rl-mono {
+  font-family: var(--rl-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.rl-muted {
+  color: var(--rl-muted);
+}
+
+.rl-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Text-style link button used in card headers. */
+.rl-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--rl-accent-link);
+  font-size: 14px;
+}
+
+.rl-link:hover {
+  color: var(--rl-accent-link-hover);
+}

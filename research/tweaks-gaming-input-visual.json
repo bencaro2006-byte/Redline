@@ -1,0 +1,414 @@
+{
+  "category": "gaming-input-visual",
+  "tweaks": [
+    {
+      "id": "game-dvr-background-recording-off",
+      "title": "Turn Off Windows Game Recording",
+      "description": "Sets Microsoft's documented 'Windows Game Recording and Broadcasting' policy to Disabled. Game Bar can no longer record clips, take screenshots or record in the background ('Record what happened') for any account on this PC.",
+      "category": "gaming",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS gain unless background recording had been switched on. It is off by default in Windows 10 22H2 and is already off on this PC. When it is on, Windows keeps encoding the last few minutes of gameplay in the background, and this policy stops that.",
+      "recommended": false,
+      "recommendReason": "Not needed on this PC: background recording is already off, so the policy would only remove Game Bar's capture features. Apply it if you never use Game Bar captures and want recording kept off for every account.",
+      "sideEffects": "Game Bar clip recording, screenshots and shortcuts such as Win+Alt+R stop working for every account, and the Captures settings page says some settings are managed by your organization. Other capture tools, such as NVIDIA's overlay, Steam or OBS, are not affected. Takes full effect after a restart.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKLM",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR",
+          "name": "AllowGameDVR",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "xbox-game-bar-off",
+      "title": "Turn Off Xbox Game Bar",
+      "description": "Turns off Xbox Game Bar for your account and stops a controller's Xbox button from opening it. Win+G no longer opens the overlay, so it can't pop up over a game by accident.",
+      "category": "gaming",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS gain expected: Game Bar does no work until you open it or start a recording. The only benefit is that the overlay can't interrupt a game.",
+      "recommended": false,
+      "recommendReason": "Optional. Worth applying only if Game Bar opens by accident or you never use it. Keep it on if you use Xbox party chat, game invites or Game Bar's performance and audio widgets.",
+      "sideEffects": "Win+G, Game Bar captures and the Game Bar widgets (performance, audio, Xbox social) stop working, and Xbox party chat and game invites that appear through Game Bar won't show. Other overlays, such as NVIDIA's or Steam's, are not affected. Fully applies after a restart.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/answers/questions/5892017/need-to-prevent-gamebar-from-opening-ever-under-an",
+        "https://github.com/The-Virtual-Desktop-Team/Virtual-Desktop-Optimization-Tool/blob/main/2009/ConfigurationFiles/DefaultUserSettings.json",
+        "https://learn.microsoft.com/en-us/answers/questions/443550/my-xbox-game-bar-automatically-disabled-and-doesnt"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
+          "name": "AppCaptureEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "System\\GameConfigStore",
+          "name": "GameDVR_Enabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\GameBar",
+          "name": "UseNexusForGameBarEnabled",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "xbox-live-services-off",
+      "title": "Disable Xbox Live Services",
+      "description": "Sets the Xbox Live Auth Manager, Xbox Live Game Save and Xbox Live Networking services to Disabled and turns off the Xbox game-save sync task, so they can't start even when a game asks for them. Only for PCs that never use Xbox or Game Pass PC games.",
+      "category": "services",
+      "risk": "moderate",
+      "impact": "low",
+      "impactNote": "Little to gain: on Windows 10 22H2 these services are set to Manual and stay stopped until an Xbox-enabled game or app starts them. On this PC all three are Manual and stopped, so disabling them frees nothing day to day.",
+      "recommended": false,
+      "recommendReason": "Not worth it by default: the services cost nothing while stopped, and disabling them breaks Xbox sign-in. Apply only if you never play Game Pass, Microsoft Store or Xbox-enabled games.",
+      "sideEffects": "Xbox app and Game Pass sign-in, Xbox cloud saves, achievements, and Xbox multiplayer and party features stop working until reverted, including in games sold elsewhere (some Steam games) that sign in with an Xbox account. Microsoft notes that with Xbox Live Game Save stopped, save data won't upload to or download from Xbox Live. The Xbox Accessory Management service is left alone, so Xbox controllers keep working.",
+      "requiresReboot": false,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/security/windows-services/security-guidelines-for-disabling-system-services-in-windows-server",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "service",
+          "name": "XblAuthManager",
+          "startType": "Disabled",
+          "default": "Manual"
+        },
+        {
+          "type": "service",
+          "name": "XblGameSave",
+          "startType": "Disabled",
+          "default": "Manual"
+        },
+        {
+          "type": "service",
+          "name": "XboxNetApiSvc",
+          "startType": "Disabled",
+          "default": "Manual"
+        },
+        {
+          "type": "scheduledTask",
+          "path": "\\Microsoft\\XblGameSave\\XblGameSaveTask",
+          "enabled": false,
+          "defaultEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "enhance-pointer-precision-off",
+      "title": "Turn Off Enhance Pointer Precision",
+      "description": "Turns off Windows mouse acceleration ('Enhance pointer precision'), so the pointer moves the same distance for the same hand movement however fast you move the mouse. Keeps aim consistent on the desktop and in games that use the Windows pointer instead of raw input.",
+      "category": "input",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change. Games that read raw mouse input, which includes most modern first-person shooters, already bypass Windows acceleration, so the difference shows on the desktop and in cursor-driven or older games.",
+      "recommended": true,
+      "recommendReason": "Acceleration is on by default in Windows 10 22H2 and is on for this PC. Turning it off makes the desktop and cursor-driven games behave like raw-input games, which helps muscle memory. It's a feel change rather than a speed gain, so untick it if you prefer the pointer as it is.",
+      "sideEffects": "The pointer can feel slower when you move the mouse quickly, especially with a low-DPI mouse on a large screen; raise the pointer speed or the mouse's DPI to compensate. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978664(v=technet.10)",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978665(v=technet.10)",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978667(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows/win32/dxtecharts/taking-advantage-of-high-dpi-mouse-movement"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Mouse",
+          "name": "MouseSpeed",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "1"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Mouse",
+          "name": "MouseThreshold1",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "6"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Mouse",
+          "name": "MouseThreshold2",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "10"
+        }
+      ]
+    },
+    {
+      "id": "keyboard-repeat-fast",
+      "title": "Faster Keyboard Repeat",
+      "description": "Shortens the delay before a held key starts repeating to the minimum (about 250 ms, down from the default of about 500 ms) and keeps the repeat rate at its fastest (about 30 per second, which is already the default).",
+      "category": "input",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Feel only: games track whether a key is held down, not repeated characters, so movement and FPS are unaffected. Only text fields, chat and consoles notice the change.",
+      "recommended": false,
+      "recommendReason": "Personal preference; nothing about this PC's hardware calls for it, and a short delay can cause accidental repeats for slower typists.",
+      "sideEffects": "Holding a key slightly too long may type extra characters. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978658(v=technet.10)",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978659(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Keyboard",
+          "name": "KeyboardDelay",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "1"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Keyboard",
+          "name": "KeyboardSpeed",
+          "valueType": "REG_SZ",
+          "value": "31",
+          "default": "31"
+        }
+      ]
+    },
+    {
+      "id": "accessibility-hotkeys-off",
+      "title": "Turn Off Sticky/Filter/Toggle Keys Shortcuts",
+      "description": "Turns off the keyboard shortcuts that switch on Sticky Keys (press Shift five times), Filter Keys (hold right Shift for eight seconds) and Toggle Keys (hold Num Lock for five seconds). Their confirmation pop-up can pull you out of a fullscreen game. The features themselves stay available in Settings.",
+      "category": "input",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change; it removes an interruption, not a bottleneck.",
+      "recommended": true,
+      "recommendReason": "Shift is a common sprint or crouch key, and these shortcuts are on by default in Windows 10 22H2, so the pop-up can appear mid-game on this PC. Nothing else changes.",
+      "sideEffects": "Anyone who relies on these shortcuts will need to turn the features on from Settings > Ease of Access > Keyboard instead. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-stickykeys",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-filterkeys",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-togglekeys",
+        "https://learn.microsoft.com/en-us/archive/blogs/embedded/stickykeys"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Accessibility\\StickyKeys",
+          "name": "Flags",
+          "valueType": "REG_SZ",
+          "value": "506",
+          "default": "510"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Accessibility\\Keyboard Response",
+          "name": "Flags",
+          "valueType": "REG_SZ",
+          "value": "122",
+          "default": "126"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Accessibility\\ToggleKeys",
+          "name": "Flags",
+          "valueType": "REG_SZ",
+          "value": "58",
+          "default": "62"
+        }
+      ]
+    },
+    {
+      "id": "visual-effects-performance",
+      "title": "Reduce Desktop Visual Effects",
+      "description": "Turns off menu, combo-box, list-box, tooltip and in-window control animations, selection fades, translucent selection rectangles, desktop icon-label shadows and Aero Peek. Font smoothing and window shadows stay on, so text stays crisp. Based on the settings Microsoft uses to slim down Windows for virtual desktops.",
+      "category": "visual",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No in-game FPS change and no measurable desktop gain on a GTX 1070; menus simply appear without animating. Microsoft recommends these settings for virtual desktops, where every redraw is sent over the network, not for gaming PCs.",
+      "recommended": false,
+      "recommendReason": "Preference only: the GTX 1070 and i7-7700 draw these effects without effort, so apply it only if you prefer menus that appear instantly.",
+      "sideEffects": "Menus and tooltips appear without animation, desktop icon labels lose their shadow (harder to read on a light wallpaper), hovering over Show desktop or a taskbar preview no longer peeks at windows, and Performance Options shows 'Custom'. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc957204(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+          "name": "VisualFXSetting",
+          "valueType": "REG_DWORD",
+          "value": 3,
+          "default": null
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Desktop",
+          "name": "UserPreferencesMask",
+          "valueType": "REG_BINARY",
+          "value": "9012078010000000",
+          "default": "9e1e078012000000"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "ListviewAlphaSelect",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "ListviewShadow",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\DWM",
+          "name": "EnableAeroPeek",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Desktop",
+          "name": "FontSmoothing",
+          "valueType": "REG_SZ",
+          "value": "2",
+          "default": "2"
+        }
+      ]
+    },
+    {
+      "id": "window-animations-off",
+      "title": "Turn Off Window Animations",
+      "description": "Turns off the minimize, maximize and restore animations and the taskbar animations, so windows change state instantly.",
+      "category": "visual",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "No FPS change; it only skips a short animation, so minimizing and restoring windows feels more immediate.",
+      "recommended": false,
+      "recommendReason": "Preference only: the GTX 1070 draws these animations without effort, so turning them off frees no performance on this PC. Apply it if you prefer instant window changes.",
+      "sideEffects": "Windows appear and disappear abruptly. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc938230(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi-recommendations-2004"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Desktop\\WindowMetrics",
+          "name": "MinAnimate",
+          "valueType": "REG_SZ",
+          "value": "0",
+          "default": "1"
+        },
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "TaskbarAnimations",
+          "valueType": "REG_DWORD",
+          "value": 0,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "id": "menu-show-delay-short",
+      "title": "Shorten Menu Show Delay",
+      "description": "Cuts the pause before a submenu opens when you hover over it from 400 ms (the Windows default) to 100 ms. Affects submenus in right-click menus and classic app menus.",
+      "category": "visual",
+      "risk": "safe",
+      "impact": "low",
+      "impactNote": "Desktop feel only; no effect on games or FPS.",
+      "recommended": false,
+      "recommendReason": "Preference only; nothing about this PC's hardware calls for it. 100 ms keeps a small buffer so submenus don't open just because the pointer passes over them.",
+      "sideEffects": "Submenus open sooner when the pointer passes over them. Applies after sign-out.",
+      "requiresReboot": true,
+      "sources": [
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc978617(v=technet.10)",
+        "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
+      ],
+      "actions": [
+        {
+          "type": "registry",
+          "hive": "HKCU",
+          "path": "Control Panel\\Desktop",
+          "name": "MenuShowDelay",
+          "valueType": "REG_SZ",
+          "value": "100",
+          "default": "400"
+        }
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "name": "Keep Game Mode on (GameBar AutoGameModeEnabled / AllowAutoGameMode)",
+      "reason": "Game Mode is already on by default in Windows 10 22H2 (the value is absent on this PC, which means on), so the tweak changed nothing. Microsoft also doesn't document these registry values. To check it, use Settings > Gaming > Game Mode."
+    },
+    {
+      "name": "Turn off Game Bar background recording (GameDVR HistoricalCaptureEnabled)",
+      "reason": "Microsoft doesn't document this per-user value. Background recording is off by default and already off on this PC. The documented 'Windows Game Recording and Broadcasting' policy, kept as 'Turn Off Windows Game Recording', covers it."
+    },
+    {
+      "name": "Turn off background apps (BackgroundAccessApplications GlobalUserDisabled / Search BackgroundAppGlobalToggle)",
+      "reason": "Microsoft documents only the Settings toggle and the 'Let Windows apps run in the background' policy, not these registry values. It warns that Cortana and Search might not work as expected when the policy is set to Force Deny. On a desktop with 32 GB of RAM the gain is negligible. To change it, use Settings > Privacy > Background apps."
+    },
+    {
+      "name": "Turn off transparency effects (Themes\\Personalize EnableTransparency)",
+      "reason": "Microsoft doesn't document this registry value; only community answers mention it. Transparency has negligible GPU cost on a GTX 1070 and no effect inside fullscreen games. To change it, use Settings > Personalization > Colors > Transparency effects."
+    }
+  ]
+}
